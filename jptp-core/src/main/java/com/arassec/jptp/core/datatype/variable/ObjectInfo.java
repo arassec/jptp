@@ -1,0 +1,64 @@
+package com.arassec.jptp.core.datatype.variable;
+
+import com.arassec.jptp.core.datatype.PtpDateTimeString;
+import com.arassec.jptp.core.datatype.PtpString;
+import com.arassec.jptp.core.datatype.UnsignedInt;
+import com.arassec.jptp.core.datatype.UnsignedShort;
+import com.arassec.jptp.core.datatype.valuerange.AssociationCode;
+import com.arassec.jptp.core.datatype.valuerange.ObjectFormatCode;
+import com.arassec.jptp.core.datatype.valuerange.ProtectionStatus;
+
+import java.nio.ByteBuffer;
+
+public record ObjectInfo(
+        StorageId storageId,
+        ObjectFormatCode objectFormat,
+        ProtectionStatus protectionStatus,
+        ObjectCompressedSize objectCompressedSize,
+        ObjectFormatCode thumbFormat,
+        ThumbCompressedSize thumbCompressedSize,
+        ThumbPixWidth thumbPixWidth,
+        ThumbPixHeight thumbPixHeight,
+        ImagePixWidth imagePixWidth,
+        ImagePixHeight imagePixHeight,
+        ImageBitDepth imageBitDepth,
+        ObjectHandle parentObject,
+        AssociationCode associationType,
+        AssociationDesc associationDesc,
+        SequenceNumber sequenceNumber,
+        Filename filename,
+        CaptureDate captureDate,
+        ModificationDate modificationDate,
+        Keywords keywords
+) implements DataContainerPayload<ObjectInfo> {
+
+    public static final ObjectInfo emptyInstance = new ObjectInfo(null, null, null,
+            null, null, null, null, null,
+            null, null, null, null, null,
+            null, null, null, null, null, null);
+
+    @Override
+    public ObjectInfo deserialize(ByteBuffer buffer) {
+        return new ObjectInfo(
+                new StorageId(UnsignedInt.deserialize(buffer)),
+                ObjectFormatCode.valueOf(UnsignedShort.deserialize(buffer)),
+                ProtectionStatus.valueOf(UnsignedShort.deserialize(buffer)),
+                new ObjectCompressedSize(UnsignedInt.deserialize(buffer)),
+                ObjectFormatCode.valueOf(UnsignedShort.deserialize(buffer)),
+                new ThumbCompressedSize(UnsignedInt.deserialize(buffer)),
+                new ThumbPixWidth(UnsignedInt.deserialize(buffer)),
+                new ThumbPixHeight(UnsignedInt.deserialize(buffer)),
+                new ImagePixWidth(UnsignedInt.deserialize(buffer)),
+                new ImagePixHeight(UnsignedInt.deserialize(buffer)),
+                new ImageBitDepth(UnsignedInt.deserialize(buffer)),
+                new ObjectHandle(UnsignedInt.deserialize(buffer)),
+                AssociationCode.valueOf(UnsignedShort.deserialize(buffer)),
+                new AssociationDesc(UnsignedInt.deserialize(buffer)),
+                new SequenceNumber(UnsignedInt.deserialize(buffer)),
+                new Filename(PtpString.deserialize(buffer)),
+                new CaptureDate(PtpDateTimeString.deserialize(buffer)),
+                new ModificationDate(PtpDateTimeString.deserialize(buffer)),
+                new Keywords(PtpString.deserialize(buffer))
+        );
+    }
+}

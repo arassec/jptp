@@ -1,0 +1,30 @@
+package com.arassec.jptp.core.datatype.valuerange;
+
+import com.arassec.jptp.core.datatype.UnsignedShort;
+
+public record AssociationCode(UnsignedShort code, String type, String interpretation) {
+
+    public static final AssociationCode UNDEFINED = new AssociationCode(UnsignedShort.valueOf((short) 0x0000), "Undefined", "Undefined");
+    public static final AssociationCode GENERIC_FOLDER = new AssociationCode(UnsignedShort.valueOf((short) 0x0001), "GenericFolder", "Unused");
+    public static final AssociationCode ALBUM = new AssociationCode(UnsignedShort.valueOf((short) 0x0002), "Album", "Reserved");
+    public static final AssociationCode TIME_SEQUENCE = new AssociationCode(UnsignedShort.valueOf((short) 0x0003), "TimeSequence", "DefaultPlaybackDelta");
+    public static final AssociationCode HORIZONTAL_PANORAMIC = new AssociationCode(UnsignedShort.valueOf((short) 0x0004), "HorizontalPanoramic", "Unused");
+    public static final AssociationCode VERTICAL_PANORAMIC = new AssociationCode(UnsignedShort.valueOf((short) 0x0005), "VerticalPanoramic", "Unused");
+    public static final AssociationCode TWO_D_PANORAMIC = new AssociationCode(UnsignedShort.valueOf((short) 0x0006), "2DPanoramic", "ImagesPerRow");
+    public static final AssociationCode ANCILLARY_DATA = new AssociationCode(UnsignedShort.valueOf((short) 0x0007), "AncillaryData", "Undefined");
+
+    public static AssociationCode valueOf(UnsignedShort code) {
+        return switch (code.value()) {
+            case 0x0000 -> UNDEFINED;
+            case 0x0001 -> GENERIC_FOLDER;
+            case 0x0002 -> ALBUM;
+            case 0x0003 -> TIME_SEQUENCE;
+            case 0x0004 -> HORIZONTAL_PANORAMIC;
+            case 0x0005 -> VERTICAL_PANORAMIC;
+            case 0x0006 -> TWO_D_PANORAMIC;
+            case 0x0007 -> ANCILLARY_DATA;
+            default -> new AssociationCode(code, "TODO", "TODO");
+        };
+    }
+
+}
