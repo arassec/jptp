@@ -29,13 +29,14 @@ public class UsbPtpDeviceDiscovery implements PtpDeviceDiscovery {
 
     @Override
     public void initialize() {
-        executeAndVerify(() -> LibUsb.init(null), "Unable to initialize LibUsb");
-        initialized = true;
+        if (!initialized) {
+            executeAndVerify(() -> LibUsb.init(null), "Unable to initialize LibUsb");
+            initialized = true;
+        }
     }
 
     @Override
     public List<PtpDevice> discoverPtpDevices() {
-
         if (!initialized) {
             throw new IllegalStateException("Device discovery not initialized");
         }
@@ -60,8 +61,10 @@ public class UsbPtpDeviceDiscovery implements PtpDeviceDiscovery {
 
     @Override
     public void teardown() {
-        LibUsb.freeDeviceList(deviceList, true);
-        LibUsb.exit(null);
+        if (initialized) {
+            LibUsb.freeDeviceList(deviceList, true);
+            LibUsb.exit(null);
+        }
     }
 
     private Optional<UsbPtpDevice> isPtpDevice(Device device) {
@@ -95,7 +98,7 @@ public class UsbPtpDeviceDiscovery implements PtpDeviceDiscovery {
                         executeAndVerify(() -> LibUsb.open(device, deviceHandle), "Unable to open USB device handle");
 
                         result.set(Optional.of(
-                                new UsbPtpDevice(device, configDescriptor, deviceHandle, new BulkOutEndpointDescriptor(bulkOutEp),
+                                new UsbPtpDevice(configDescriptor, deviceHandle, new BulkOutEndpointDescriptor(bulkOutEp),
                                         new BulkInEndpointDescriptor(bulkInEp), new InterruptEndpointDescriptor(interruptEp))
                         ));
                     }
@@ -114,7 +117,6 @@ public class UsbPtpDeviceDiscovery implements PtpDeviceDiscovery {
         }
         return Optional.empty();
     }
-
 
     private void executeAndVerify(UsbMethodExecutor usbExecutor, String errorMessage) {
         int result = usbExecutor.execute();

@@ -6,8 +6,8 @@ public interface PtpDeviceDiscovery {
 
     void initialize();
 
-    List<PtpDevice> discoverPtpDevices();
-
     void teardown();
+
+    List<PtpDevice> discoverPtpDevices();
 
 }

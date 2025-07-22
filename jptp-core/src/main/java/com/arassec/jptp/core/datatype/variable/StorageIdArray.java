@@ -1,5 +1,6 @@
 package com.arassec.jptp.core.datatype.variable;
 
+import com.arassec.jptp.core.PtpContainerPayload;
 import com.arassec.jptp.core.datatype.UnsignedInt;
 import lombok.extern.slf4j.Slf4j;
 
@@ -8,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public record StorageIdArray(List<StorageId> ids) implements DataContainerPayload<StorageIdArray> {
+public record StorageIdArray(List<StorageId> ids) implements PtpContainerPayload<StorageIdArray> {
 
     public static StorageIdArray emptyInstance = new StorageIdArray(List.of());
 

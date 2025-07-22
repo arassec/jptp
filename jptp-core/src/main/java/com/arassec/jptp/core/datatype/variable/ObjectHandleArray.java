@@ -1,12 +1,13 @@
 package com.arassec.jptp.core.datatype.variable;
 
+import com.arassec.jptp.core.PtpContainerPayload;
 import com.arassec.jptp.core.datatype.UnsignedInt;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public record ObjectHandleArray(List<ObjectHandle> handles) implements DataContainerPayload<ObjectHandleArray> {
+public record ObjectHandleArray(List<ObjectHandle> handles) implements PtpContainerPayload<ObjectHandleArray> {
 
     public static ObjectHandleArray emptyInstance = new ObjectHandleArray(List.of());
 

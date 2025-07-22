@@ -1,7 +1,7 @@
 package com.arassec.jptp.core;
 
 import com.arassec.jptp.core.container.CommandContainer;
-import com.arassec.jptp.core.container.ResponseContainer;
+import com.arassec.jptp.core.container.EventContainer;
 import com.arassec.jptp.core.datatype.variable.*;
 
 public interface PtpDevice {
@@ -12,14 +12,12 @@ public interface PtpDevice {
 
     SessionId getSessionId();
 
-    TransactionId getTransactionId();
+    SessionId incrementSessionId();
 
-    CommandResult<DeviceInfo> getDeviceInfo();
+    TransactionId incrementTransactionId();
 
-    ResponseContainer openSession();
+    <P extends PtpContainerPayload<P>> CommandResult<P> sendCommand(CommandContainer container, P payloadInstance);
 
-    ResponseContainer closeSession();
-
-    <P extends DataContainerPayload<P>> CommandResult<P> sendCommand(CommandContainer container, P payloadInstance);
+    <P extends PtpContainerPayload<P>> EventContainer<P> pollForEvent(P payloadInstance);
 
 }

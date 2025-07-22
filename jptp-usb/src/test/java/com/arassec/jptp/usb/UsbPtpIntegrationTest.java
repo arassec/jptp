@@ -5,11 +5,13 @@ import com.arassec.jptp.core.PtpDevice;
 import com.arassec.jptp.core.container.CommandContainer;
 import com.arassec.jptp.core.container.ResponseContainer;
 import com.arassec.jptp.core.datatype.valuerange.ObjectFormatCode;
+import com.arassec.jptp.core.datatype.valuerange.OperationCode;
 import com.arassec.jptp.core.datatype.valuerange.ResponseCode;
 import com.arassec.jptp.core.datatype.variable.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -22,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @Slf4j
+@Disabled("Only for manual tests.")
 class UsbPtpIntegrationTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -36,7 +39,9 @@ class UsbPtpIntegrationTest {
         ptpDevices.forEach(ptpDevice -> {
             ptpDevice.initialize();
 
-            CommandResult<DeviceInfo> commandResult = ptpDevice.getDeviceInfo();
+            CommandResult<DeviceInfo> commandResult = ptpDevice.sendCommand(
+                    CommandContainer.newInstance(OperationCode.GET_DEVICE_INFO, ptpDevice.getSessionId(), ptpDevice.incrementTransactionId(), null, null, null),
+                    DeviceInfo.emptyInstance);
 
             try {
                 log.info("Data from PTP device:\n{}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(commandResult.dataContainer()));
@@ -67,26 +72,28 @@ class UsbPtpIntegrationTest {
 
         ptpDevice.initialize();
 
-        ResponseContainer responseContainer = ptpDevice.openSession();
+        ResponseContainer responseContainer = ptpDevice
+                .sendCommand(CommandContainer.newInstance(OperationCode.OPEN_SESSION, ptpDevice.incrementSessionId(), ptpDevice.incrementTransactionId()), null)
+                .responseContainer();
+
         if (ResponseCode.OK.equals(responseContainer.responseCode())) {
 
             try {
-                CommandContainer getStorageIdsCommand = CommandContainer.getStorageIdsCommand(ptpDevice.getTransactionId());
+                CommandContainer getStorageIdsCommand = CommandContainer.newInstance(OperationCode.GET_STORAGE_IDS, null, ptpDevice.incrementTransactionId());
                 CommandResult<StorageIdArray> storageIdArrayCommandResult = ptpDevice.sendCommand(getStorageIdsCommand, StorageIdArray.emptyInstance);
 
                 StorageId storageId = storageIdArrayCommandResult.dataContainer().payload().ids().getFirst();
 
-                CommandContainer getStorageInfoCommand = CommandContainer.getStorageInfoCommand(ptpDevice.getTransactionId(), storageId);
+                CommandContainer getStorageInfoCommand = CommandContainer.newInstance(OperationCode.GET_STORAGE_INFO, null, ptpDevice.incrementTransactionId(), storageId.id());
                 CommandResult<StorageInfo> storageInfoCommandResult = ptpDevice.sendCommand(getStorageInfoCommand, StorageInfo.emptyInstance);
                 log.info("Storage type: {}", storageInfoCommandResult.dataContainer().payload().storageType());
 
-                CommandContainer getObjectHandlesCommand = CommandContainer.getObjectHandlesCommand(ptpDevice.getTransactionId(), storageId, null, null);
+                CommandContainer getObjectHandlesCommand = CommandContainer.newInstance(OperationCode.GET_OBJECT_HANDLES, null, ptpDevice.incrementTransactionId(), storageId.id());
                 CommandResult<ObjectHandleArray> objectHandlesCommandResult = ptpDevice.sendCommand(getObjectHandlesCommand, ObjectHandleArray.emptyInstance);
-
 
                 ObjectHandle objectHandle = null;
                 for (ObjectHandle possibleObjectHandle : objectHandlesCommandResult.dataContainer().payload().handles()) {
-                    CommandContainer getObjectInfoCommand = CommandContainer.getObjectInfoCommand(ptpDevice.getTransactionId(), possibleObjectHandle);
+                    CommandContainer getObjectInfoCommand = CommandContainer.newInstance(OperationCode.GET_OBJECT_INFO, null, ptpDevice.incrementTransactionId(), possibleObjectHandle.handle());
                     CommandResult<ObjectInfo> objectInfoCommandResult = ptpDevice.sendCommand(getObjectInfoCommand, ObjectInfo.emptyInstance);
 
                     if (ObjectFormatCode.EXIF_JPEG.equals(objectInfoCommandResult.dataContainer().payload().objectFormat())) {
@@ -97,7 +104,7 @@ class UsbPtpIntegrationTest {
                 }
 
                 if (objectHandle != null) {
-                    CommandContainer getObjectCommand = CommandContainer.getObjectCommand(ptpDevice.getTransactionId(), objectHandle);
+                    CommandContainer getObjectCommand = CommandContainer.newInstance(OperationCode.GET_OBJECT, null, ptpDevice.incrementTransactionId(), objectHandle.handle());
                     CommandResult<DataObject> objectCommandResult = ptpDevice.sendCommand(getObjectCommand, DataObject.emptyInstance);
 
                     try {
@@ -108,7 +115,9 @@ class UsbPtpIntegrationTest {
                 }
 
             } finally {
-                responseContainer = ptpDevice.closeSession();
+                responseContainer = ptpDevice
+                        .sendCommand(CommandContainer.newInstance(OperationCode.CLOSE_SESSION, null, ptpDevice.incrementTransactionId()), null)
+                        .responseContainer();
 
                 if (ResponseCode.OK.equals(responseContainer.responseCode())) {
                     testSuccess.set(true);
@@ -122,6 +131,5 @@ class UsbPtpIntegrationTest {
 
         assertThat(testSuccess.get()).isTrue();
     }
-
 
 }

@@ -2,11 +2,8 @@ package com.arassec.jptp.core.container;
 
 import com.arassec.jptp.core.datatype.UnsignedInt;
 import com.arassec.jptp.core.datatype.valuerange.ContainerType;
-import com.arassec.jptp.core.datatype.valuerange.ObjectFormatCode;
 import com.arassec.jptp.core.datatype.valuerange.OperationCode;
-import com.arassec.jptp.core.datatype.variable.ObjectHandle;
 import com.arassec.jptp.core.datatype.variable.SessionId;
-import com.arassec.jptp.core.datatype.variable.StorageId;
 import com.arassec.jptp.core.datatype.variable.TransactionId;
 
 import java.nio.ByteBuffer;
@@ -21,99 +18,53 @@ public record CommandContainer(
         UnsignedInt paramTwo,
         UnsignedInt paramThree) {
 
-    public static CommandContainer getDeviceInfoCommand(SessionId sessionId, TransactionId transactionId) {
+    // 4 Byte 'containerLength' + 2 Byte 'containerType' + 2 Byte 'OperationCode'
+    private static final int BASE_HEADER_LENGTH = 8;
+
+
+    public static CommandContainer newInstance(OperationCode operationCode,
+                                               SessionId sessionId,
+                                               TransactionId transactionId) {
+        return newInstance(operationCode, sessionId, transactionId, null, null, null);
+    }
+
+    public static CommandContainer newInstance(OperationCode operationCode,
+                                               SessionId sessionId,
+                                               TransactionId transactionId,
+                                               UnsignedInt paramOne) {
+        return newInstance(operationCode, sessionId, transactionId, paramOne, null, null);
+    }
+
+    public static CommandContainer newInstance(OperationCode operationCode,
+                                               SessionId sessionId,
+                                               TransactionId transactionId,
+                                               UnsignedInt paramOne,
+                                               UnsignedInt paramTwo) {
+        return newInstance(operationCode, sessionId, transactionId, paramOne, paramTwo, null);
+    }
+
+    public static CommandContainer newInstance(OperationCode operationCode,
+                                               SessionId sessionId,
+                                               TransactionId transactionId,
+                                               UnsignedInt paramOne,
+                                               UnsignedInt paramTwo,
+                                               UnsignedInt paramThree) {
+
+        int containerLength = BASE_HEADER_LENGTH
+                + (sessionId != null ? 4 : 0)
+                + (transactionId != null ? 4 : 0)
+                + (paramOne != null ? 4 : 0)
+                + (paramTwo != null ? 4 : 0)
+                + (paramThree != null ? 4 : 0);
+
         return new CommandContainer(
-                UnsignedInt.valueOf(28),
-                OperationCode.GET_DEVICE_INFO,
+                UnsignedInt.valueOf(containerLength),
+                operationCode,
                 sessionId,
                 transactionId,
-                UnsignedInt.nullInstance(),
-                UnsignedInt.nullInstance(),
-                UnsignedInt.nullInstance()
-        );
-    }
-
-    public static CommandContainer openSessionCommand(SessionId sessionId) {
-        return new CommandContainer(
-                UnsignedInt.valueOf(16),
-                OperationCode.OPEN_SESSION,
-                sessionId,
-                new TransactionId(UnsignedInt.nullInstance()),
-                null,
-                null,
-                null
-        );
-    }
-
-    public static CommandContainer closeSessionCommand(TransactionId transactionId) {
-        return new CommandContainer(
-                UnsignedInt.valueOf(12),
-                OperationCode.CLOSE_SESSION,
-                null,
-                transactionId,
-                null,
-                null,
-                null
-        );
-    }
-
-    public static CommandContainer getStorageIdsCommand(TransactionId transactionId) {
-        return new CommandContainer(
-                UnsignedInt.valueOf(12),
-                OperationCode.GET_STORAGE_IDS,
-                null,
-                transactionId,
-                null,
-                null,
-                null
-        );
-    }
-
-    public static CommandContainer getStorageInfoCommand(TransactionId transactionId, StorageId storageId) {
-        return new CommandContainer(
-                UnsignedInt.valueOf(16),
-                OperationCode.GET_STORAGE_INFO,
-                null,
-                transactionId,
-                storageId.id(),
-                null,
-                null
-        );
-    }
-
-    public static CommandContainer getObjectHandlesCommand(TransactionId transactionId, StorageId storageId, ObjectFormatCode objectFormatCode, ObjectHandle objectHandle) {
-        return new CommandContainer(
-                UnsignedInt.valueOf(16 + (objectFormatCode != null ? 4 : 0) + (objectHandle != null ? 4 : 0)),
-                OperationCode.GET_OBJECT_HANDLES,
-                null,
-                transactionId,
-                storageId.id(),
-                objectFormatCode != null ? UnsignedInt.valueOf(objectFormatCode.code().value()) : null,
-                objectHandle != null ? objectHandle.handle() : null
-        );
-    }
-
-    public static CommandContainer getObjectInfoCommand(TransactionId transactionId, ObjectHandle objectHandle) {
-        return new CommandContainer(
-                UnsignedInt.valueOf(16),
-                OperationCode.GET_OBJECT_INFO,
-                null,
-                transactionId,
-                objectHandle.handle(),
-                null,
-                null
-        );
-    }
-
-    public static CommandContainer getObjectCommand(TransactionId transactionId, ObjectHandle objectHandle) {
-        return new CommandContainer(
-                UnsignedInt.valueOf(16),
-                OperationCode.GET_OBJECT,
-                null,
-                transactionId,
-                objectHandle.handle(),
-                null,
-                null
+                paramOne,
+                paramTwo,
+                paramThree
         );
     }
 

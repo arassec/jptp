@@ -1,5 +1,6 @@
 package com.arassec.jptp.core.datatype.variable;
 
+import com.arassec.jptp.core.PtpContainerPayload;
 import com.arassec.jptp.core.datatype.PtpString;
 import com.arassec.jptp.core.datatype.UnsignedInt;
 import com.arassec.jptp.core.datatype.UnsignedLong;
@@ -19,7 +20,7 @@ public record StorageInfo(
         FreeSpaceInImages freeSpaceInImages,
         StorageDescription storageDescription,
         VolumeLabel volumeLabel
-) implements DataContainerPayload<StorageInfo> {
+) implements PtpContainerPayload<StorageInfo> {
 
     public static StorageInfo emptyInstance = new StorageInfo(null, null, null,
             null, null, null, null, null);

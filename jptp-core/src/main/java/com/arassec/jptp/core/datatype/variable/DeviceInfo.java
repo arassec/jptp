@@ -1,5 +1,6 @@
 package com.arassec.jptp.core.datatype.variable;
 
+import com.arassec.jptp.core.PtpContainerPayload;
 import com.arassec.jptp.core.datatype.PtpString;
 import com.arassec.jptp.core.datatype.UnsignedInt;
 import com.arassec.jptp.core.datatype.UnsignedShort;
@@ -22,7 +23,7 @@ public record DeviceInfo(
         Manufacturer manufacturer,
         Model model,
         DeviceVersion deviceVersion,
-        SerialNumber serialNumber) implements DataContainerPayload<DeviceInfo> {
+        SerialNumber serialNumber) implements PtpContainerPayload<DeviceInfo> {
 
     public static DeviceInfo emptyInstance = new DeviceInfo(null, null, null,
             null, null, null, null, null,

@@ -59,6 +59,7 @@
     <modules>
         <module>jptp-core</module>
         <module>jptp-usb</module>
+        <module>jptp-main</module>
     </modules>
 
     <build>
@@ -102,6 +103,13 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>2.0.16</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>5.17.0</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>

@@ -1,5 +1,6 @@
 package com.arassec.jptp.core.datatype.variable;
 
+import com.arassec.jptp.core.PtpContainerPayload;
 import com.arassec.jptp.core.datatype.PtpDateTimeString;
 import com.arassec.jptp.core.datatype.PtpString;
 import com.arassec.jptp.core.datatype.UnsignedInt;
@@ -30,7 +31,7 @@ public record ObjectInfo(
         CaptureDate captureDate,
         ModificationDate modificationDate,
         Keywords keywords
-) implements DataContainerPayload<ObjectInfo> {
+) implements PtpContainerPayload<ObjectInfo> {
 
     public static final ObjectInfo emptyInstance = new ObjectInfo(null, null, null,
             null, null, null, null, null,

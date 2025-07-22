@@ -1,26 +1,26 @@
 package com.arassec.jptp.core.container;
 
-import com.arassec.jptp.core.datatype.valuerange.ContainerType;
-import com.arassec.jptp.core.datatype.valuerange.OperationCode;
+import com.arassec.jptp.core.PtpContainerPayload;
 import com.arassec.jptp.core.datatype.UnsignedInt;
 import com.arassec.jptp.core.datatype.UnsignedShort;
-import com.arassec.jptp.core.PtpContainerPayload;
+import com.arassec.jptp.core.datatype.valuerange.ContainerType;
+import com.arassec.jptp.core.datatype.valuerange.EventCode;
 import com.arassec.jptp.core.datatype.variable.TransactionId;
 
 import java.nio.ByteBuffer;
 
-public record DataContainer<P extends PtpContainerPayload<P>>(
+public record EventContainer<P extends PtpContainerPayload<P>>(
         UnsignedInt length,
         ContainerType containerType,
-        OperationCode operationCode,
+        EventCode eventCode,
         TransactionId transactionId,
         P payload) {
 
-    public static <P extends PtpContainerPayload<P>> DataContainer<P> deserialize(ByteBuffer buffer, P payloadInstance) {
-        return new DataContainer<>(
+    public static <P extends PtpContainerPayload<P>> EventContainer<P> deserialize(ByteBuffer buffer, P payloadInstance) {
+        return new EventContainer<>(
                 UnsignedInt.deserialize(buffer),
                 ContainerType.valueOf(UnsignedShort.deserialize(buffer)),
-                OperationCode.valueOf(UnsignedShort.deserialize(buffer)),
+                EventCode.valueOf(UnsignedShort.deserialize(buffer)),
                 new TransactionId(UnsignedInt.deserialize(buffer)),
                 payloadInstance.deserialize(buffer)
         );
