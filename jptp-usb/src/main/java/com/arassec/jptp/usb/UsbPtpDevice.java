@@ -118,7 +118,7 @@ public class UsbPtpDevice implements PtpDevice {
         if (!initialized) {
             executeAndVerify(() -> LibUsb.controlTransfer(deviceHandle,
                     (byte) (LibUsb.ENDPOINT_OUT | LibUsb.REQUEST_TYPE_CLASS | LibUsb.RECIPIENT_INTERFACE),
-                    (byte) 0x66, (short) 0, (short) 0, ByteBuffer.allocateDirect(0), 1000), "Could not send 'reset' to USB device!");
+                    (byte) 0x66, (short) 0, (short) 0, ByteBuffer.allocateDirect(0), defaultTimeoutInMillis), "Could not send 'reset' to USB device!");
             eventHandlingThread.start();
             initialized = true;
         }
