@@ -1,6 +1,11 @@
 package com.arassec.jptp.core.datatype.variable;
 
-import com.arassec.jptp.core.datatype.PtpDateTimeString;
+import com.arassec.jptp.core.datatype.PtpDateTime;
 
-public record ModificationDate(PtpDateTimeString date) {
+/**
+ * The 'Modification date' data type.
+ *
+ * @param date The date.
+ */
+public record ModificationDate(PtpDateTime date) {
 }

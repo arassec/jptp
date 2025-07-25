@@ -1,5 +1,6 @@
 package com.arassec.jptp.usb;
 
+import com.arassec.jptp.core.PtpContainerPayload;
 import com.arassec.jptp.core.PtpDevice;
 import com.arassec.jptp.core.container.CommandContainer;
 import com.arassec.jptp.core.container.DataContainer;
@@ -9,50 +10,109 @@ import com.arassec.jptp.core.datatype.UnsignedInt;
 import com.arassec.jptp.core.datatype.UnsignedShort;
 import com.arassec.jptp.core.datatype.valuerange.ContainerType;
 import com.arassec.jptp.core.datatype.variable.CommandResult;
-import com.arassec.jptp.core.PtpContainerPayload;
 import com.arassec.jptp.core.datatype.variable.SessionId;
 import com.arassec.jptp.core.datatype.variable.TransactionId;
 import com.arassec.jptp.usb.event.EventHandlingThread;
 import com.arassec.jptp.usb.type.BulkInEndpointDescriptor;
 import com.arassec.jptp.usb.type.BulkOutEndpointDescriptor;
 import com.arassec.jptp.usb.type.InterruptEndpointDescriptor;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.usb4java.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.usb4java.ConfigDescriptor;
+import org.usb4java.DeviceHandle;
+import org.usb4java.LibUsb;
+import org.usb4java.LibUsbException;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
-@Slf4j
-@RequiredArgsConstructor
+/**
+ * Implements a {@link PtpDevice} using USB as transport layer.
+ */
 public class UsbPtpDevice implements PtpDevice {
 
+    /**
+     * Logger.
+     */
+    private final Logger log = LoggerFactory.getLogger(UsbPtpDevice.class);
+
+    /**
+     * LibUSB {@link ConfigDescriptor} for the used USB device.
+     */
     private final ConfigDescriptor configDescriptor;
 
+    /**
+     * LibUSB {@link DeviceHandle} to the used USB device.
+     */
     private final DeviceHandle deviceHandle;
 
+    /**
+     * Output channel to the selected USB device.
+     */
     private final BulkOutEndpointDescriptor bulkOut;
 
+    /**
+     * Input channel from the selected USB device.
+     */
     private final BulkInEndpointDescriptor bulkIn;
 
+    /**
+     * Interrupt channel of the selected USB device.
+     */
     private final InterruptEndpointDescriptor interrupt;
 
+    /**
+     * Thread to enable USB events.
+     */
     private final EventHandlingThread eventHandlingThread = new EventHandlingThread();
 
+    /**
+     * Holds whether the class has been initialized or not.
+     */
     private boolean initialized = false;
 
+    /**
+     * The PTP transaction ID. Always incremented...
+     */
     private int transactionId = 0;
 
+    /**
+     * The PTP session ID. Must be incremented when calling an OpenSession operation.
+     */
     private int sessionId = 0;
 
-    @Setter
+    /**
+     * Default timeout for USB device communication.
+     */
     private long defaultTimeoutInMillis = 1000;
 
-    @Setter
+    /**
+     * Timeout for waiting for USB device events.
+     */
     private long eventTimeoutInMillis = 5000;
 
+    /**
+     * Creates a new instance.
+     *
+     * @param configDescriptor The USB device's config descriptor.
+     * @param deviceHandle     The USB device handle.
+     * @param bulkOut          The output channel to the device.
+     * @param bulkIn           The input channel from the device.
+     * @param interrupt        The interrupt channel of the device.
+     */
+    public UsbPtpDevice(ConfigDescriptor configDescriptor, DeviceHandle deviceHandle, BulkOutEndpointDescriptor bulkOut,
+                        BulkInEndpointDescriptor bulkIn, InterruptEndpointDescriptor interrupt) {
+        this.configDescriptor = configDescriptor;
+        this.deviceHandle = deviceHandle;
+        this.bulkOut = bulkOut;
+        this.bulkIn = bulkIn;
+        this.interrupt = interrupt;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void initialize() {
         if (!initialized) {
@@ -64,6 +124,9 @@ public class UsbPtpDevice implements PtpDevice {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void teardown() {
         if (initialized) {
@@ -78,23 +141,35 @@ public class UsbPtpDevice implements PtpDevice {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SessionId getSessionId() {
         return new SessionId(UnsignedInt.valueOf(sessionId));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SessionId incrementSessionId() {
         sessionId++;
         return new SessionId(UnsignedInt.valueOf(sessionId));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public TransactionId incrementTransactionId() {
         transactionId++;
         return new TransactionId(UnsignedInt.valueOf(transactionId));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <P extends PtpContainerPayload<P>> CommandResult<P> sendCommand(CommandContainer container, P payloadInstance) {
         if (!initialized) {
@@ -107,19 +182,19 @@ public class UsbPtpDevice implements PtpDevice {
         executeAndVerify(() -> LibUsb.bulkTransfer(deviceHandle, bulkOut.descriptor().bEndpointAddress(), commandBuffer, bytesTransferred, defaultTimeoutInMillis), "Could not send command");
         log.trace("command sent ({} bytes): {}", bytesTransferred.get(0), container);
 
-        ByteBuffer responseBuffer = readResponse(bulkIn.descriptor().bEndpointAddress(), defaultTimeoutInMillis);
+        ByteBuffer responseBuffer = readDataAndResponse(bulkIn.descriptor().bEndpointAddress(), defaultTimeoutInMillis);
 
         DataContainer<P> dataContainer = null;
-        ResponseContainer responseContainer = null;
+        ResponseContainer responseContainer;
 
         if (ContainerType.DATA.equals(getContainerType(responseBuffer))) {
             dataContainer = DataContainer.deserialize(responseBuffer, payloadInstance);
-            responseBuffer = readResponse(bulkIn.descriptor().bEndpointAddress(), defaultTimeoutInMillis);
+            responseBuffer = readDataAndResponse(bulkIn.descriptor().bEndpointAddress(), defaultTimeoutInMillis);
             responseContainer = ResponseContainer.deserialize(responseBuffer);
         } else if (ContainerType.RESPONSE.equals(getContainerType(responseBuffer))) {
             responseContainer = ResponseContainer.deserialize(responseBuffer);
             if (payloadInstance != null) {
-                responseBuffer = readResponse(bulkIn.descriptor().bEndpointAddress(), defaultTimeoutInMillis);
+                responseBuffer = readDataAndResponse(bulkIn.descriptor().bEndpointAddress(), defaultTimeoutInMillis);
                 dataContainer = DataContainer.deserialize(responseBuffer, payloadInstance);
             }
         } else {
@@ -134,9 +209,12 @@ public class UsbPtpDevice implements PtpDevice {
         return new CommandResult<>(dataContainer, responseContainer);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <P extends PtpContainerPayload<P>> EventContainer<P> pollForEvent(P payloadInstance) {
-        ByteBuffer responseBuffer = readResponse(interrupt.descriptor().bEndpointAddress(), eventTimeoutInMillis);
+        ByteBuffer responseBuffer = readDataAndResponse(interrupt.descriptor().bEndpointAddress(), eventTimeoutInMillis);
 
         if (!ContainerType.EVENT.equals(getContainerType(responseBuffer))) {
             throw new IllegalStateException("Unexpected container type received: " + getContainerType(responseBuffer));
@@ -145,7 +223,32 @@ public class UsbPtpDevice implements PtpDevice {
         return EventContainer.deserialize(responseBuffer, payloadInstance);
     }
 
-    private ByteBuffer readResponse(byte bEndpointAddress, long timeoutInMillis) {
+    /**
+     * Sets the default timeout for USB operations.
+     *
+     * @param defaultTimeoutInMillis The timeout to use.
+     */
+    public void setDefaultTimeoutInMillis(long defaultTimeoutInMillis) {
+        this.defaultTimeoutInMillis = defaultTimeoutInMillis;
+    }
+
+    /**
+     * Sets the timeout for USB event handling.
+     *
+     * @param eventTimeoutInMillis The timeout to use.
+     */
+    public void setEventTimeoutInMillis(long eventTimeoutInMillis) {
+        this.eventTimeoutInMillis = eventTimeoutInMillis;
+    }
+
+    /**
+     * Reads a response container and an optional data container as response to a command request.
+     *
+     * @param bEndpointAddress The USB device address to read the response from.
+     * @param timeoutInMillis  The timeout to wait before aborting the read operation.
+     * @return The read container data as {@link ByteBuffer}.
+     */
+    private ByteBuffer readDataAndResponse(byte bEndpointAddress, long timeoutInMillis) {
         final ByteBuffer initialBuffer = ByteBuffer.allocateDirect(bulkIn.descriptor().wMaxPacketSize());
         initialBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
@@ -194,6 +297,12 @@ public class UsbPtpDevice implements PtpDevice {
         return resultBuffer;
     }
 
+    /**
+     * Returns the container type based on the read bytes.
+     *
+     * @param buffer The container as read from the USB device as byte buffer.
+     * @return The {@link ContainerType} as denoted by the fifth and sixth byte of the buffer.
+     */
     private ContainerType getContainerType(ByteBuffer buffer) {
         buffer.getInt();
         ContainerType containerType = ContainerType.valueOf(UnsignedShort.deserialize(buffer));
@@ -201,6 +310,12 @@ public class UsbPtpDevice implements PtpDevice {
         return containerType;
     }
 
+    /**
+     * Executes the USB operation and verifies a successful execution.
+     *
+     * @param usbExecutor  The callback executing the LibUSB operation.
+     * @param errorMessage The error message to use in the exception that is thrown if the result is not {@link LibUsb#SUCCESS}.
+     */
     private void executeAndVerify(UsbMethodExecutor usbExecutor, String errorMessage) {
         int result = usbExecutor.execute();
         if (result < LibUsb.SUCCESS) {

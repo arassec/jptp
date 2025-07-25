@@ -6,6 +6,13 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Value object modeling a PTP operation code.
+ *
+ * @param code       The code.
+ * @param name       The code's name.
+ * @param ptpVersion The PTP version introducing the code.
+ */
 public record OperationCode(UnsignedShort code, String name, PtpVersion ptpVersion) {
 
     public static final OperationCode UNDEFINED = new OperationCode(UnsignedShort.valueOf((short) 0x1000), "Undefined", PtpVersion.V1_0);
@@ -47,6 +54,12 @@ public record OperationCode(UnsignedShort code, String name, PtpVersion ptpVersi
     public static final OperationCode GET_STREAM_INFO = new OperationCode(UnsignedShort.valueOf((short) 0x1024), "GetStreamInfo", PtpVersion.V1_1);
     public static final OperationCode GET_STREAM = new OperationCode(UnsignedShort.valueOf((short) 0x1025), "GetStream", PtpVersion.V1_1);
 
+    /**
+     * Returns an operation code for the given code.
+     *
+     * @param code The code to use.
+     * @return An {@link OperationCode} instance for the given code.
+     */
     public static OperationCode valueOf(UnsignedShort code) {
         return switch (code.value()) {
             case 0x1000 -> UNDEFINED;
@@ -91,6 +104,12 @@ public record OperationCode(UnsignedShort code, String name, PtpVersion ptpVersi
         };
     }
 
+    /**
+     * Deserializes the given byte buffer into a list of operation codes.
+     *
+     * @param buffer The {@link ByteBuffer} containing a PTP array with operation codes.
+     * @return A list of {@link OperationCode}s from the buffer.
+     */
     public static List<OperationCode> deserializeArray(ByteBuffer buffer) {
         List<OperationCode> operationCodes = new ArrayList<>();
         for (int i = 0; i < buffer.getInt(); i++) {

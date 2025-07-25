@@ -19,6 +19,7 @@
 
     <dependencies>
 
+        <!--suppress VulnerableLibrariesLocal -->
         <dependency>
             <groupId>com.arassec.jptp</groupId>
             <artifactId>jptp-usb</artifactId>

@@ -9,12 +9,13 @@ import java.util.Optional;
  * Defines high-level access to a PTP device for image capturing.
  * <p>
  * Call {@link #initialize()} prior to any usage.
- * Call {@link #teardown()} to release acquired resources prior to shutting down.
+ * Call {@link #teardown()} to release acquired resources before shutting down.
  */
 public interface ImageCaptureDevice {
 
     /**
-     * Initializes the device manager.
+     * Initializes the device manager. The first available {@link com.arassec.jptp.core.PtpDevice} found is used, if
+     * it supports all required operations.
      *
      * @return {@code true}, if the device has been initialized successfully, {@code false} otherwise.
      */
@@ -26,7 +27,7 @@ public interface ImageCaptureDevice {
     void teardown();
 
     /**
-     * Returns the {@link DeviceInfo} of the image capture device.
+     * Returns the {@link DeviceInfo} of the selected image capture device.
      *
      * @return The optional {@link DeviceInfo} of the used device if available.
      */

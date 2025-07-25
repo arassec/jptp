@@ -10,8 +10,8 @@ import com.arassec.jptp.core.datatype.valuerange.EventCode;
 import com.arassec.jptp.core.datatype.valuerange.OperationCode;
 import com.arassec.jptp.core.datatype.valuerange.ResponseCode;
 import com.arassec.jptp.core.datatype.variable.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
@@ -20,18 +20,45 @@ import java.util.Optional;
  * <p>
  * Uses the first PTP device found which is capable of capturing images.
  */
-@Slf4j
-@RequiredArgsConstructor
 public class PtpImageCaptureDevice implements ImageCaptureDevice {
 
+    /**
+     * Logger.
+     */
+    private final Logger log = LoggerFactory.getLogger(PtpImageCaptureDevice.class);
+
+    /**
+     * A {@link PtpDeviceDiscovery} to find PTP devices.
+     */
     private final PtpDeviceDiscovery ptpDeviceDiscovery;
 
+    /**
+     * Stores whether the class has been initialized or not.
+     */
     private boolean initialized = false;
 
+    /**
+     * The first {@link PtpDevice} found which is capable of capturing images.
+     */
     private PtpDevice ptpDevice;
 
+    /**
+     * The {@link DeviceInfo} of the selected PTP device.
+     */
     private DeviceInfo selectedDeviceInfo;
 
+    /**
+     * Creates a new instance.
+     *
+     * @param ptpDeviceDiscovery A discovery for PTP devices.
+     */
+    public PtpImageCaptureDevice(PtpDeviceDiscovery ptpDeviceDiscovery) {
+        this.ptpDeviceDiscovery = ptpDeviceDiscovery;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean initialize() {
 
@@ -44,8 +71,8 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
                     selectedDeviceInfo = optionalDeviceInfo.get();
                     ptpDevice = device;
                     initialized = true;
-                    log.info("PTP device found and initialized: {} - {}", selectedDeviceInfo.manufacturer().value().rawValue(),
-                            selectedDeviceInfo.model().value().rawValue());
+                    log.info("PTP device found and initialized: {} - {}", selectedDeviceInfo.manufacturer().value().value(),
+                            selectedDeviceInfo.model().value().value());
                     return true;
                 }
             }

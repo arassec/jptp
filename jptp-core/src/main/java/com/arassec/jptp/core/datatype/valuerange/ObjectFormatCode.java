@@ -6,6 +6,14 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Value object for a PTP object format code.
+ *
+ * @param code        The code.
+ * @param type        The type.
+ * @param format      The format.
+ * @param description A description.
+ */
 public record ObjectFormatCode(UnsignedShort code, char type, String format, String description) {
 
     public static ObjectFormatCode UNDEFINED = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3000), 'A', "Undefined", "Undefined non-image object");
@@ -42,6 +50,12 @@ public record ObjectFormatCode(UnsignedShort code, char type, String format, Str
     public static ObjectFormatCode JPX = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3810), 'I', "JPX", "JPEG2000 Extended File Format");
     public static ObjectFormatCode DNG = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3811), 'I', "DNG", "Digital Negative Format (PTP v1.1");
 
+    /**
+     * Returns an instance for the given code.
+     *
+     * @param code The code to use.
+     * @return An {@link ObjectFormatCode} for the given code.
+     */
     public static ObjectFormatCode valueOf(UnsignedShort code) {
         return switch (code.value()) {
             case 0x3000 -> UNDEFINED;
@@ -81,7 +95,13 @@ public record ObjectFormatCode(UnsignedShort code, char type, String format, Str
         };
     }
 
-    public static List<ObjectFormatCode> parseArray(ByteBuffer buffer) {
+    /**
+     * Deserializes the supplied byte buffer into a list of codes.
+     *
+     * @param buffer The {@link ByteBuffer} containing a PTP array of object format codes.
+     * @return A list of corresponding {@link ObjectFormatCode}s.
+     */
+    public static List<ObjectFormatCode> deserializeArray(ByteBuffer buffer) {
         List<ObjectFormatCode> operationCodes = new ArrayList<>();
         for (int i = 0; i < buffer.getInt(); i++) {
             operationCodes.add(ObjectFormatCode.valueOf(UnsignedShort.deserialize(buffer)));

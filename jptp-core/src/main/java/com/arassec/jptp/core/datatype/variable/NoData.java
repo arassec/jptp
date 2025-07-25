@@ -10,6 +10,11 @@ import java.nio.ByteBuffer;
  */
 public record NoData() implements PtpContainerPayload<NoData> {
 
+    /**
+     * Creates a new instance without data.
+     *
+     * @return A new {@link NoData} instance.
+     */
     public static NoData emptyInstance() {
         return new NoData();
     }

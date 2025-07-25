@@ -1,6 +1,11 @@
 package com.arassec.jptp.core.datatype.variable;
 
-import com.arassec.jptp.core.datatype.PtpDateTimeString;
+import com.arassec.jptp.core.datatype.PtpDateTime;
 
-public record CaptureDate(PtpDateTimeString date) {
+/**
+ * the 'capture date' data type.
+ *
+ * @param date The value.
+ */
+public record CaptureDate(PtpDateTime date) {
 }

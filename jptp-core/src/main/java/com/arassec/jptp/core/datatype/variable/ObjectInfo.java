@@ -1,7 +1,7 @@
 package com.arassec.jptp.core.datatype.variable;
 
 import com.arassec.jptp.core.PtpContainerPayload;
-import com.arassec.jptp.core.datatype.PtpDateTimeString;
+import com.arassec.jptp.core.datatype.PtpDateTime;
 import com.arassec.jptp.core.datatype.PtpString;
 import com.arassec.jptp.core.datatype.UnsignedInt;
 import com.arassec.jptp.core.datatype.UnsignedShort;
@@ -11,6 +11,29 @@ import com.arassec.jptp.core.datatype.valuerange.ProtectionStatus;
 
 import java.nio.ByteBuffer;
 
+/**
+ * The 'Object Info' data set.
+ *
+ * @param storageId            The ID of the storage this object lies on.
+ * @param objectFormat         The object's format.
+ * @param protectionStatus     The protection status.
+ * @param objectCompressedSize The object's compressed size.
+ * @param thumbFormat          The thumbnail format.
+ * @param thumbCompressedSize  The thumbnails compressed size.
+ * @param thumbPixWidth        The thumbnails width in pixels.
+ * @param thumbPixHeight       The thumbnails height in pixels.
+ * @param imagePixWidth        The image width in pixels.
+ * @param imagePixHeight       The image height in pixels.
+ * @param imageBitDepth        The image's bit depth.
+ * @param parentObject         The object's parent.
+ * @param associationType      The object's association type.
+ * @param associationDesc      The object's association description.
+ * @param sequenceNumber       the object's sequence number.
+ * @param filename             The filename.
+ * @param captureDate          The capture date.
+ * @param modificationDate     The modification date.
+ * @param keywords             The object's keywords.
+ */
 public record ObjectInfo(
         StorageId storageId,
         ObjectFormatCode objectFormat,
@@ -33,11 +56,17 @@ public record ObjectInfo(
         Keywords keywords
 ) implements PtpContainerPayload<ObjectInfo> {
 
+    /**
+     * An empty instance for deserialization purposes.
+     */
     public static final ObjectInfo emptyInstance = new ObjectInfo(null, null, null,
             null, null, null, null, null,
             null, null, null, null, null,
             null, null, null, null, null, null);
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ObjectInfo deserialize(ByteBuffer buffer) {
         return new ObjectInfo(
@@ -57,9 +86,10 @@ public record ObjectInfo(
                 new AssociationDesc(UnsignedInt.deserialize(buffer)),
                 new SequenceNumber(UnsignedInt.deserialize(buffer)),
                 new Filename(PtpString.deserialize(buffer)),
-                new CaptureDate(PtpDateTimeString.deserialize(buffer)),
-                new ModificationDate(PtpDateTimeString.deserialize(buffer)),
+                new CaptureDate(PtpDateTime.deserialize(buffer)),
+                new ModificationDate(PtpDateTime.deserialize(buffer)),
                 new Keywords(PtpString.deserialize(buffer))
         );
     }
+
 }

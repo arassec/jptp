@@ -2,8 +2,19 @@ package com.arassec.jptp.core.datatype;
 
 import java.nio.ByteBuffer;
 
-public record PtpString(String rawValue) {
+/**
+ * Value object for a PTP string.
+ *
+ * @param value The string's value.
+ */
+public record PtpString(String value) {
 
+    /**
+     * Deserializes a PTP string into this object.
+     *
+     * @param buffer The {@link ByteBuffer} containing the string.
+     * @return A new {@link PtpString} instance containing the string value.
+     */
     public static PtpString deserialize(ByteBuffer buffer) {
         byte stringLength = buffer.get();
 

@@ -2,17 +2,26 @@ package com.arassec.jptp.core.datatype.variable;
 
 import com.arassec.jptp.core.PtpContainerPayload;
 import com.arassec.jptp.core.datatype.UnsignedInt;
-import lombok.extern.slf4j.Slf4j;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
+/**
+ * The 'Storage ID Array' data type.
+ *
+ * @param ids The storage IDs as List.
+ */
 public record StorageIdArray(List<StorageId> ids) implements PtpContainerPayload<StorageIdArray> {
 
+    /**
+     * An empty instance to support deserialization.
+     */
     public static StorageIdArray emptyInstance = new StorageIdArray(List.of());
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public StorageIdArray deserialize(ByteBuffer buffer) {
         List<StorageId> ids = new ArrayList<>();

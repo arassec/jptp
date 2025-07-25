@@ -2,6 +2,12 @@ package com.arassec.jptp.core.datatype.valuerange;
 
 import com.arassec.jptp.core.datatype.UnsignedShort;
 
+/**
+ * Value object for PTP response codes.
+ *
+ * @param code        The response code.
+ * @param description A description of the code.
+ */
 public record ResponseCode(UnsignedShort code, String description) {
 
     public static ResponseCode UNDEFINED = new ResponseCode(UnsignedShort.valueOf((short) 0x2000), "Undefined");
@@ -41,6 +47,12 @@ public record ResponseCode(UnsignedShort code, String description) {
     public static ResponseCode NO_STREAM_ENABLED = new ResponseCode(UnsignedShort.valueOf((short) 0x2022), "No stream enabled");
     public static ResponseCode INVALID_DATASET = new ResponseCode(UnsignedShort.valueOf((short) 0x2023), "Invalid Dataset");
 
+    /**
+     * Returns a response code for the given code.
+     *
+     * @param code The code to use.
+     * @return A {@link ResponseCode} for the given code.
+     */
     public static ResponseCode valueOf(UnsignedShort code) {
         return switch (code.value()) {
             case 0x2000 -> UNDEFINED;

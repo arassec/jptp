@@ -6,6 +6,13 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Value object modelling a PTP device property code.
+ *
+ * @param code       The code.
+ * @param name       The code's name.
+ * @param ptpVersion The PTP version introducing the code.
+ */
 public record DevicePropCode(UnsignedShort code, String name, PtpVersion ptpVersion) {
 
     public static DevicePropCode UNDEFINED = new DevicePropCode(UnsignedShort.valueOf((short) 0x5000), "Undefined", PtpVersion.V1_0);
@@ -54,6 +61,12 @@ public record DevicePropCode(UnsignedShort code, String name, PtpVersion ptpVers
     public static DevicePropCode AUDIO_BIT_PER_SAMPLE = new DevicePropCode(UnsignedShort.valueOf((short) 0x502B), "AudioBitPerSample", PtpVersion.V1_1);
     public static DevicePropCode AUDIO_VOLUME = new DevicePropCode(UnsignedShort.valueOf((short) 0x502C), "AudioVolume", PtpVersion.V1_1);
 
+    /**
+     * Returns an instance for the given code.
+     *
+     * @param code The code to use.
+     * @return A {@link DevicePropCode} instance for the given code.
+     */
     public static DevicePropCode valueOf(UnsignedShort code) {
         return switch (code.value()) {
             case 0x5000 -> UNDEFINED;
@@ -105,7 +118,13 @@ public record DevicePropCode(UnsignedShort code, String name, PtpVersion ptpVers
         };
     }
 
-    public static List<DevicePropCode> parseArray(ByteBuffer buffer) {
+    /**
+     * Deserializes the supplied byte buffer into a List of device property codes.
+     *
+     * @param buffer The {@link ByteBuffer} containing the PTP array of codes.
+     * @return A list of {@link DevicePropCode} instances for the given codes.
+     */
+    public static List<DevicePropCode> deserializesArray(ByteBuffer buffer) {
         List<DevicePropCode> devicePropCodes = new ArrayList<>();
         for (int i = 0; i < buffer.getInt(); i++) {
             devicePropCodes.add(DevicePropCode.valueOf(UnsignedShort.deserialize(buffer)));

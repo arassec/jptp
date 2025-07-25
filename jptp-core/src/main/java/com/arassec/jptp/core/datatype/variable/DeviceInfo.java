@@ -9,6 +9,24 @@ import com.arassec.jptp.core.datatype.valuerange.*;
 import java.nio.ByteBuffer;
 import java.util.List;
 
+/**
+ * The 'Device Info' data set.
+ *
+ * @param standardVersion           The PTP version.
+ * @param vendorExtensionId         The vendor extension ID.
+ * @param vendorExtensionVersion    The vendor extension version.
+ * @param vendorExtensionDesc       The vendor extension description.
+ * @param functionalMode            The device's functional mode.
+ * @param operationsSupported       List of supported operations by the device.
+ * @param eventsSupported           List of supported events by the device.
+ * @param devicePropertiesSupported List of supported device properties.
+ * @param captureFormats            List of available capture formats.
+ * @param imageFormats              List of available image formats.
+ * @param manufacturer              The device's manufacturer.
+ * @param model                     The device model.
+ * @param deviceVersion             The device version.
+ * @param serialNumber              the device's serial number.
+ */
 public record DeviceInfo(
         PtpVersion standardVersion,
         VendorExtensionId vendorExtensionId,
@@ -25,10 +43,16 @@ public record DeviceInfo(
         DeviceVersion deviceVersion,
         SerialNumber serialNumber) implements PtpContainerPayload<DeviceInfo> {
 
+    /**
+     * An empty instance for deserialization purposes.
+     */
     public static DeviceInfo emptyInstance = new DeviceInfo(null, null, null,
             null, null, null, null, null,
             null, null, null, null, null, null);
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DeviceInfo deserialize(ByteBuffer buffer) {
         if (buffer.hasRemaining()) {
@@ -40,9 +64,9 @@ public record DeviceInfo(
                     FunctionalMode.valueOf(UnsignedShort.deserialize(buffer)),
                     OperationCode.deserializeArray(buffer),
                     EventCode.deserializeArray(buffer),
-                    DevicePropCode.parseArray(buffer),
-                    ObjectFormatCode.parseArray(buffer),
-                    ObjectFormatCode.parseArray(buffer),
+                    DevicePropCode.deserializesArray(buffer),
+                    ObjectFormatCode.deserializeArray(buffer),
+                    ObjectFormatCode.deserializeArray(buffer),
                     new Manufacturer(PtpString.deserialize(buffer)),
                     new Model(PtpString.deserialize(buffer)),
                     new DeviceVersion(PtpString.deserialize(buffer)),

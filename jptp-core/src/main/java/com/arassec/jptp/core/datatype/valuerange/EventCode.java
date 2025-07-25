@@ -6,6 +6,12 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Value object modelling PTP event codes.
+ *
+ * @param code The event code.
+ * @param name The event code's name.
+ */
 public record EventCode(UnsignedShort code, String name) {
 
     public static EventCode UNDEFINED = new EventCode(UnsignedShort.valueOf((short) 0x4000), "Undefined");
@@ -24,6 +30,12 @@ public record EventCode(UnsignedShort code, String name) {
     public static EventCode CAPTURE_COMPLETE = new EventCode(UnsignedShort.valueOf((short) 0x400D), "CaptureComplete");
     public static EventCode UNREPORTED_STATUS = new EventCode(UnsignedShort.valueOf((short) 0x400E), "UnreportedStatus");
 
+    /**
+     * Returns an {@link EventCode} instance for the given code.
+     *
+     * @param code The code to use.
+     * @return An instance for that code.
+     */
     public static EventCode valueOf(UnsignedShort code) {
         return switch (code.value()) {
             case 0x4000 -> UNDEFINED;
@@ -45,6 +57,12 @@ public record EventCode(UnsignedShort code, String name) {
         };
     }
 
+    /**
+     * Deserializes the supplied byte buffer into a list of codes.
+     *
+     * @param buffer The {@link ByteBuffer} containing the PTP array of event codes.
+     * @return A list of {@link EventCode}s from the supplied buffer.
+     */
     public static List<EventCode> deserializeArray(ByteBuffer buffer) {
         List<EventCode> eventCodes = new ArrayList<>();
         for (int i = 0; i < buffer.getInt(); i++) {

@@ -4,10 +4,21 @@ import com.arassec.jptp.core.PtpContainerPayload;
 
 import java.nio.ByteBuffer;
 
+/**
+ * The 'data object' data type.
+ *
+ * @param data The data as byte array.
+ */
 public record DataObject(byte[] data) implements PtpContainerPayload<DataObject> {
 
+    /**
+     * An empty instance for deserialization purposes.
+     */
     public static final DataObject emptyInstance = new DataObject(new byte[0]);
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DataObject deserialize(ByteBuffer buffer) {
         // TODO: Check if necessary: buffer.position(12);

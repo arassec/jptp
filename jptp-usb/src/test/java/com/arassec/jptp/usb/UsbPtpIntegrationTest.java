@@ -8,11 +8,10 @@ import com.arassec.jptp.core.datatype.valuerange.ObjectFormatCode;
 import com.arassec.jptp.core.datatype.valuerange.OperationCode;
 import com.arassec.jptp.core.datatype.valuerange.ResponseCode;
 import com.arassec.jptp.core.datatype.variable.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,11 +22,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 
-@Slf4j
+/**
+ * Integration tests for {@link UsbPtpDevice}s. Only for manual use.
+ */
 @Disabled("Only for manual tests.")
 class UsbPtpIntegrationTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    /**
+     * Logger.
+     */
+    private final Logger log = LoggerFactory.getLogger(UsbPtpIntegrationTest.class);
 
     @Test
     void testGetDeviceInfo() {
@@ -43,12 +47,8 @@ class UsbPtpIntegrationTest {
                     CommandContainer.newInstance(OperationCode.GET_DEVICE_INFO, ptpDevice.getSessionId(), ptpDevice.incrementTransactionId(), null, null, null),
                     DeviceInfo.emptyInstance);
 
-            try {
-                log.info("Data from PTP device:\n{}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(commandResult.dataContainer()));
-                log.info("Response from PTP device:\n{}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(commandResult.responseContainer()));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            log.info("Data from PTP device: {}", commandResult.dataContainer());
+            log.info("Response from PTP device: {}", commandResult.responseContainer());
 
             ptpDevice.teardown();
         });
@@ -97,7 +97,7 @@ class UsbPtpIntegrationTest {
                     CommandResult<ObjectInfo> objectInfoCommandResult = ptpDevice.sendCommand(getObjectInfoCommand, ObjectInfo.emptyInstance);
 
                     if (ObjectFormatCode.EXIF_JPEG.equals(objectInfoCommandResult.dataContainer().payload().objectFormat())) {
-                        log.info("File found: {}", objectInfoCommandResult.dataContainer().payload().filename().name().rawValue());
+                        log.info("File found: {}", objectInfoCommandResult.dataContainer().payload().filename().name().value());
                         objectHandle = possibleObjectHandle;
                         break;
                     }

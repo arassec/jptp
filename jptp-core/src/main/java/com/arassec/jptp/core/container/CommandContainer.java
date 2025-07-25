@@ -9,6 +9,17 @@ import com.arassec.jptp.core.datatype.variable.TransactionId;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+/**
+ * A command container which is used to send commands to a PTP device.
+ *
+ * @param length        The total length of the container in bytes.
+ * @param operationCode The operation code to execute.
+ * @param sessionId     The PTP session ID.
+ * @param transactionId The PTP transaction ID.
+ * @param paramOne      The first command parameter.
+ * @param paramTwo      The second command parameter.
+ * @param paramThree    The third command parameter.
+ */
 public record CommandContainer(
         UnsignedInt length,
         OperationCode operationCode,
@@ -18,16 +29,35 @@ public record CommandContainer(
         UnsignedInt paramTwo,
         UnsignedInt paramThree) {
 
-    // 4 Byte 'containerLength' + 2 Byte 'containerType' + 2 Byte 'OperationCode'
+    /**
+     * The header length of every command container:
+     * 4 Byte 'containerLength' + 2 Byte 'containerType' + 2 Byte 'OperationCode'
+     */
     private static final int BASE_HEADER_LENGTH = 8;
 
-
+    /**
+     * Creates a new instance without parameters.
+     *
+     * @param operationCode The operation code to use.
+     * @param sessionId     The session ID to use.
+     * @param transactionId The transaction ID to use.
+     * @return A new {@link CommandContainer} instance.
+     */
     public static CommandContainer newInstance(OperationCode operationCode,
                                                SessionId sessionId,
                                                TransactionId transactionId) {
         return newInstance(operationCode, sessionId, transactionId, null, null, null);
     }
 
+    /**
+     * Creates a new instance with one parameter.
+     *
+     * @param operationCode The operation code to use.
+     * @param sessionId     The session ID to use.
+     * @param transactionId The transaction ID to use.
+     * @param paramOne      The first parameter to use.
+     * @return A new {@link CommandContainer} instance.
+     */
     public static CommandContainer newInstance(OperationCode operationCode,
                                                SessionId sessionId,
                                                TransactionId transactionId,
@@ -35,6 +65,16 @@ public record CommandContainer(
         return newInstance(operationCode, sessionId, transactionId, paramOne, null, null);
     }
 
+    /**
+     * Creates a new instance with two parameters.
+     *
+     * @param operationCode The operation code to use.
+     * @param sessionId     The session ID to use.
+     * @param transactionId The transaction ID to use.
+     * @param paramOne      The first parameter to use.
+     * @param paramTwo      The second parameter to use.
+     * @return A new {@link CommandContainer} instance.
+     */
     public static CommandContainer newInstance(OperationCode operationCode,
                                                SessionId sessionId,
                                                TransactionId transactionId,
@@ -43,6 +83,17 @@ public record CommandContainer(
         return newInstance(operationCode, sessionId, transactionId, paramOne, paramTwo, null);
     }
 
+    /**
+     * Creates a new instance with three parameters.
+     *
+     * @param operationCode The operation code to use.
+     * @param sessionId     The session ID to use.
+     * @param transactionId The transaction ID to use.
+     * @param paramOne      The first parameter to use.
+     * @param paramTwo      The second parameter to use.
+     * @param paramThree    The third parameter to use.
+     * @return A new {@link CommandContainer} instance.
+     */
     public static CommandContainer newInstance(OperationCode operationCode,
                                                SessionId sessionId,
                                                TransactionId transactionId,
@@ -68,6 +119,11 @@ public record CommandContainer(
         );
     }
 
+    /**
+     * Serializes this command container as byte buffer.
+     *
+     * @return The {@link ByteBuffer} representing this command.
+     */
     public ByteBuffer serialize() {
         ByteBuffer buffer = ByteBuffer.allocateDirect(length().value());
         buffer.order(ByteOrder.LITTLE_ENDIAN);
