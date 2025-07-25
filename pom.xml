@@ -54,7 +54,7 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
         <!-- Versions -->
-        <mockito.version>5.17.0</mockito.version>
+        <mockito.version>5.18.0</mockito.version>
     </properties>
 
     <modules>
