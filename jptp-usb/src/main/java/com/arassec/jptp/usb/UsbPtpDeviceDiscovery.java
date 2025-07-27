@@ -2,9 +2,13 @@ package com.arassec.jptp.usb;
 
 import com.arassec.jptp.core.PtpDevice;
 import com.arassec.jptp.core.PtpDeviceDiscovery;
+import com.arassec.jptp.core.datatype.variable.ObjectHandle;
+import com.arassec.jptp.core.datatype.variable.ObjectHandleArray;
 import com.arassec.jptp.usb.type.BulkInEndpointDescriptor;
 import com.arassec.jptp.usb.type.BulkOutEndpointDescriptor;
 import com.arassec.jptp.usb.type.InterruptEndpointDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.usb4java.*;
 
 import java.util.ArrayList;
@@ -17,6 +21,11 @@ import java.util.concurrent.atomic.AtomicReference;
  * Implements a {@link PtpDeviceDiscovery} using USB as transport layer.
  */
 public class UsbPtpDeviceDiscovery implements PtpDeviceDiscovery {
+
+    /**
+     * Logger.
+     */
+    private static final Logger log = LoggerFactory.getLogger(UsbPtpDeviceDiscovery.class);
 
     /**
      * USB subclass for still image devices.
@@ -74,6 +83,7 @@ public class UsbPtpDeviceDiscovery implements PtpDeviceDiscovery {
             executeAndVerify(() -> LibUsb.getDeviceDescriptor(device, deviceDescriptor), "Unable to retrieve USB device descriptor");
 
             if (deviceDescriptor.bDeviceClass() == LibUsb.CLASS_PER_INTERFACE) {
+                log.debug("Found potential USB PTP device: {}", device);
                 isPtpDevice(device).ifPresent(ptpDevices::add);
             }
 
@@ -117,6 +127,8 @@ public class UsbPtpDeviceDiscovery implements PtpDeviceDiscovery {
                     if (interfaceClass == LibUsb.CLASS_IMAGE
                             && interfaceSubClass == INTERFACE_SUBCLASS_STILL_IMAGE_CAPTURE
                             && interfaceProtocol == INTERFACE_PROTOCOL_PTP) {
+
+                        log.debug("Found USB PTP device: {}", device);
 
                         List<EndpointDescriptor> endpointDescriptors = Arrays.asList(usbInterfaceDescriptor.endpoint());
 

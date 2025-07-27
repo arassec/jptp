@@ -38,6 +38,6 @@ public interface ImageCaptureDevice {
      *
      * @return A PTP {@link DataObject} containing the captured image as byte array in the returned payload.
      */
-    DataObject captureImage();
+    Optional<DataObject> captureImage();
 
 }

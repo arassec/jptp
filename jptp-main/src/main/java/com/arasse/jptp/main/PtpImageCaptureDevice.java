@@ -3,16 +3,15 @@ package com.arasse.jptp.main;
 import com.arassec.jptp.core.PtpDevice;
 import com.arassec.jptp.core.PtpDeviceDiscovery;
 import com.arassec.jptp.core.container.CommandContainer;
-import com.arassec.jptp.core.container.EventContainer;
 import com.arassec.jptp.core.container.ResponseContainer;
 import com.arassec.jptp.core.datatype.UnsignedInt;
-import com.arassec.jptp.core.datatype.valuerange.EventCode;
 import com.arassec.jptp.core.datatype.valuerange.OperationCode;
 import com.arassec.jptp.core.datatype.valuerange.ResponseCode;
 import com.arassec.jptp.core.datatype.variable.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -46,6 +45,12 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
      * The {@link DeviceInfo} of the selected PTP device.
      */
     private DeviceInfo selectedDeviceInfo;
+
+    /**
+     * Contains all existing objects on the device. Used to circumvent non-standard behavior, when 'initiate capture' is
+     * not responded with the events specified in the standard.
+     */
+    private List<ObjectHandle> existingObjects;
 
     /**
      * Creates a new instance.
@@ -89,7 +94,7 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
         if (initialized) {
 
             ResponseContainer responseContainer = ptpDevice
-                    .sendCommand(CommandContainer.newInstance(OperationCode.CLOSE_SESSION, ptpDevice.incrementSessionId(), null), null)
+                    .sendCommand(CommandContainer.newInstance(OperationCode.CLOSE_SESSION, null, ptpDevice.incrementTransactionId()), null)
                     .responseContainer();
 
             if (!ResponseCode.OK.equals(responseContainer.responseCode())) {
@@ -123,7 +128,7 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
      * {@inheritDoc}
      */
     @Override
-    public DataObject captureImage() {
+    public Optional<DataObject> captureImage() {
         if (!initialized) {
             throw new IllegalStateException("Device has not been initialized!");
         }
@@ -132,34 +137,16 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
             throw new IllegalStateException("No PTP device available!");
         }
 
-        ResponseContainer responseContainer = ptpDevice.sendCommand(CommandContainer.newInstance(OperationCode.INITIATE_CAPTURE, ptpDevice.incrementSessionId(), null, UnsignedInt.nullInstance(), UnsignedInt.nullInstance()), null)
+        existingObjects = getObjectHandles().handles();
+
+        ResponseContainer responseContainer = ptpDevice.sendCommand(CommandContainer.newInstance(OperationCode.INITIATE_CAPTURE,
+                        null, ptpDevice.incrementTransactionId(), UnsignedInt.zeroInstance(), UnsignedInt.zeroInstance()), null)
                 .responseContainer();
         if (!ResponseCode.OK.equals(responseContainer.responseCode())) {
             throw new IllegalStateException("Could not initiate capture mode!");
         }
 
-        // Capture finished:
-        EventContainer<NoData> captureCompleteeventContainer = ptpDevice.pollForEvent(NoData.emptyInstance());
-        if (!EventCode.CAPTURE_COMPLETE.equals(captureCompleteeventContainer.eventCode())) {
-            throw new IllegalStateException("Unexpected event received: " + captureCompleteeventContainer);
-        }
-
-        // Object added:
-        EventContainer<ObjectHandle> objectAddedEventContainer = ptpDevice.pollForEvent(ObjectHandle.emptyInstance());
-        if (!EventCode.OBJECT_ADDED.equals(objectAddedEventContainer.eventCode())) {
-            throw new IllegalStateException("Unexpected event received: " + objectAddedEventContainer);
-        }
-
-        CommandResult<DataObject> objectCommandResult = ptpDevice.sendCommand(
-                CommandContainer.newInstance(OperationCode.GET_OBJECT, null, ptpDevice.incrementTransactionId(), objectAddedEventContainer.payload().handle()),
-                DataObject.emptyInstance);
-        if (!ResponseCode.OK.equals(responseContainer.responseCode())) {
-            throw new IllegalStateException("Could not get captured image!");
-        }
-
-        // TODO: Maybe delete object?
-
-        return objectCommandResult.dataContainer().payload();
+        return retrieveNewDataObject();
     }
 
     /**
@@ -180,18 +167,19 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
         if (deviceInfoCommandResult == null
                 || deviceInfoCommandResult.responseContainer() == null
                 || !ResponseCode.OK.equals(deviceInfoCommandResult.responseContainer().responseCode())) {
-            log.warn("PTP device found but DeviceInfo could not be retrieved: {}", deviceInfoCommandResult);
+            log.debug("PTP device found but DeviceInfo could not be retrieved: {}", deviceInfoCommandResult);
             return Optional.empty();
         } else {
             DeviceInfo deviceInfo = deviceInfoCommandResult.dataContainer().payload();
 
-            if (deviceDoesNotSupport(deviceInfo, OperationCode.INITIATE_CAPTURE) || deviceDoesNotSupport(deviceInfo, OperationCode.GET_OBJECT)) {
-                log.warn("PTP device does not support required operations INITIATE_CAPTURE and GET_OBJECT!");
+            if (deviceDoesNotSupport(deviceInfo, OperationCode.INITIATE_CAPTURE)
+                    || deviceDoesNotSupport(deviceInfo, OperationCode.GET_OBJECT)) {
+                log.debug("PTP device does not support required operations!");
                 return Optional.empty();
             }
 
             ResponseContainer responseContainer = ptpDevice
-                    .sendCommand(CommandContainer.newInstance(OperationCode.OPEN_SESSION, ptpDevice.incrementSessionId(), null), null)
+                    .sendCommand(CommandContainer.newInstance(OperationCode.OPEN_SESSION, ptpDevice.incrementSessionId(), ptpDevice.incrementTransactionId()), null)
                     .responseContainer();
 
             if (!ResponseCode.OK.equals(responseContainer.responseCode())) {
@@ -200,6 +188,83 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
 
             return Optional.of(deviceInfo);
         }
+    }
+
+    /**
+     * Polls for a new image on the device. If found, downloads the image from the device, deletes it on the device and
+     * returns the object.
+     * <p>
+     * Not as elegant as it could be, but Nikon does not seem to send the events described in the PTP specification.
+     *
+     * @return The newly created {@link DataObject} if it exists yet.
+     */
+    private Optional<DataObject> retrieveNewDataObject() {
+        for (int i = 0; i < 10; i++) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException("Interrupted during image retrieval!", e);
+            }
+
+            Optional<ObjectHandle> newestObject = getNewestObject();
+
+            if (newestObject.isPresent()) {
+
+                CommandResult<DataObject> result = ptpDevice.sendCommand(
+                        CommandContainer.newInstance(OperationCode.GET_OBJECT, null, ptpDevice.incrementTransactionId(), newestObject.get().handle()),
+                        DataObject.emptyInstance);
+                if (!ResponseCode.OK.equals(result.responseContainer().responseCode())) {
+                    throw new IllegalStateException("Could not get captured image!");
+                }
+
+                ResponseContainer deleteObjectResponse = ptpDevice.sendCommand(
+                        CommandContainer.newInstance(OperationCode.DELETE_OBJECT, null, ptpDevice.incrementTransactionId(), newestObject.get().handle()),
+                        null).responseContainer();
+                if (!ResponseCode.OK.equals(deleteObjectResponse.responseCode())) {
+                    throw new IllegalStateException("Could not delete newly captured image from device!");
+                }
+
+                return Optional.of(result.dataContainer().payload());
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * Returns the newest object found on the device.
+     *
+     * @return The newest object.
+     */
+    private Optional<ObjectHandle> getNewestObject() {
+        List<ObjectHandle> currentHandles = getObjectHandles().handles();
+
+        currentHandles.removeAll(existingObjects);
+
+        if (currentHandles.isEmpty()) {
+            return Optional.empty();
+        }
+
+        if (currentHandles.size() != 1) {
+            throw new IllegalStateException("Expected 1 object handle but got " + currentHandles.size());
+        }
+
+        return Optional.of(currentHandles.getFirst());
+    }
+
+    /**
+     * Returns all existing objects that are stored on the device.
+     *
+     * @return All objects stored on the device.
+     */
+    private ObjectHandleArray getObjectHandles() {
+        CommandContainer getObjectHandlesCommand = CommandContainer.newInstance(OperationCode.GET_OBJECT_HANDLES, null, ptpDevice.incrementTransactionId(), UnsignedInt.maxInstance());
+        CommandResult<ObjectHandleArray> result = ptpDevice.sendCommand(getObjectHandlesCommand, ObjectHandleArray.emptyInstance);
+        if (!ResponseCode.OK.equals(result.responseContainer().responseCode())) {
+            throw new IllegalStateException("Could not load object handles!");
+        }
+        return result.dataContainer().payload();
     }
 
     /**

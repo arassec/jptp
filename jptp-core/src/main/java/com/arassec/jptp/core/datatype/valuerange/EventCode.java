@@ -65,7 +65,8 @@ public record EventCode(UnsignedShort code, String name) {
      */
     public static List<EventCode> deserializeArray(ByteBuffer buffer) {
         List<EventCode> eventCodes = new ArrayList<>();
-        for (int i = 0; i < buffer.getInt(); i++) {
+        int arrayLength = buffer.getInt();
+        for (int i = 0; i < arrayLength; i++) {
             eventCodes.add(EventCode.valueOf(UnsignedShort.deserialize(buffer)));
         }
         return eventCodes;

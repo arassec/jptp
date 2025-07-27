@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * Integration test of the {@link ImageCaptureDevice} for manual use.
@@ -34,9 +35,13 @@ public class PtpImageCaptureDeviceIntegrationTest {
         ImageCaptureDevice imageCaptureDevice = new PtpImageCaptureDevice(new UsbPtpDeviceDiscovery());
 
         if (imageCaptureDevice.initialize()) {
-            log.info("Found PTP device: {}", imageCaptureDevice.getDeviceInfo().orElseThrow());
-            DataObject dataObject = imageCaptureDevice.captureImage();
-            Files.write(Path.of("target/test.jpg"), dataObject.data());
+            Optional<DataObject> optionalDataObject = imageCaptureDevice.captureImage();
+            if (optionalDataObject.isPresent()) {
+                Files.write(Path.of("target/test.jpg"), optionalDataObject.get().data());
+                log.info("Capture image successfully");
+            } else {
+                log.info("Capture image failed");
+            }
             imageCaptureDevice.teardown();
         }
     }

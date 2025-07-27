@@ -103,7 +103,8 @@ public record ObjectFormatCode(UnsignedShort code, char type, String format, Str
      */
     public static List<ObjectFormatCode> deserializeArray(ByteBuffer buffer) {
         List<ObjectFormatCode> operationCodes = new ArrayList<>();
-        for (int i = 0; i < buffer.getInt(); i++) {
+        int arrayLength = buffer.getInt();
+        for (int i = 0; i < arrayLength; i++) {
             operationCodes.add(ObjectFormatCode.valueOf(UnsignedShort.deserialize(buffer)));
         }
         return operationCodes;

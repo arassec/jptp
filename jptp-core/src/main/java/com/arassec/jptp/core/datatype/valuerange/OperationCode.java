@@ -112,7 +112,8 @@ public record OperationCode(UnsignedShort code, String name, PtpVersion ptpVersi
      */
     public static List<OperationCode> deserializeArray(ByteBuffer buffer) {
         List<OperationCode> operationCodes = new ArrayList<>();
-        for (int i = 0; i < buffer.getInt(); i++) {
+        int arrayLength = buffer.getInt();
+        for (int i = 0; i < arrayLength; i++) {
             operationCodes.add(OperationCode.valueOf(UnsignedShort.deserialize(buffer)));
         }
         return operationCodes;

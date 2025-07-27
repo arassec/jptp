@@ -61,4 +61,18 @@ public interface PtpDevice {
      */
     <P extends PtpContainerPayload<P>> EventContainer<P> pollForEvent(P payloadInstance);
 
+    /**
+     * Sets the default timeout for device operations.
+     *
+     * @param defaultTimeoutInMillis The timeout to use.
+     */
+    void setDefaultTimeoutInMillis(long defaultTimeoutInMillis);
+
+    /**
+     * Sets the timeout for device event handling.
+     *
+     * @param eventTimeoutInMillis The timeout to use.
+     */
+    void setEventTimeoutInMillis(long eventTimeoutInMillis);
+
 }

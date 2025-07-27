@@ -18,7 +18,7 @@ public record PtpString(String value) {
     public static PtpString deserialize(ByteBuffer buffer) {
         byte stringLength = buffer.get();
 
-        if (stringLength <= 0) {
+        if (stringLength <= 0 || !buffer.hasRemaining()) {
             return new PtpString("");
         }
 

@@ -10,12 +10,21 @@ import java.nio.ByteBuffer;
 public record UnsignedInt(int value) {
 
     /**
-     * Creates a new instance with only null values.
+     * Creates a new instance with a null value.
      *
      * @return A new instance.
      */
-    public static UnsignedInt nullInstance() {
-        return new UnsignedInt(nullValue());
+    public static UnsignedInt zeroInstance() {
+        return new UnsignedInt(zero());
+    }
+
+    /**
+     * Creates a new instance with the maximum value.
+     *
+     * @return A new instance.
+     */
+    public static UnsignedInt maxInstance() {
+        return new UnsignedInt(max());
     }
 
     /**
@@ -23,8 +32,17 @@ public record UnsignedInt(int value) {
      *
      * @return 0
      */
-    public static int nullValue() {
+    public static int zero() {
         return 0x00000000;
+    }
+
+    /**
+     * Returns the PTP max value as int.
+     *
+     * @return max
+     */
+    public static int max() {
+        return 0xFFFFFFFF;
     }
 
     /**
