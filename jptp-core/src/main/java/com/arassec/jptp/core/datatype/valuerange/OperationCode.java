@@ -100,7 +100,7 @@ public record OperationCode(UnsignedShort code, String name, PtpVersion ptpVersi
             case 0x1023 -> GET_FILESYSTEM_MANIFEST;
             case 0x1024 -> GET_STREAM_INFO;
             case 0x1025 -> GET_STREAM;
-            default -> new OperationCode(code, "TODO", PtpVersion.V1_0);
+            default -> new OperationCode(code, "Vendor Specific", PtpVersion.V1_0);
         };
     }
 
@@ -117,6 +117,14 @@ public record OperationCode(UnsignedShort code, String name, PtpVersion ptpVersi
             operationCodes.add(OperationCode.valueOf(UnsignedShort.deserialize(buffer)));
         }
         return operationCodes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "OperationCode[code='" + String.format("0x%04X", code.value()) + "', name='" + name + "']";
     }
 
 }

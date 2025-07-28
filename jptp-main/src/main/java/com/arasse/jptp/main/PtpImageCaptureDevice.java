@@ -173,6 +173,7 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
             DeviceInfo deviceInfo = deviceInfoCommandResult.dataContainer().payload();
 
             if (deviceDoesNotSupport(deviceInfo, OperationCode.INITIATE_CAPTURE)
+                    || deviceDoesNotSupport(deviceInfo, OperationCode.GET_OBJECT_HANDLES)
                     || deviceDoesNotSupport(deviceInfo, OperationCode.GET_OBJECT)) {
                 log.debug("PTP device does not support required operations!");
                 return Optional.empty();

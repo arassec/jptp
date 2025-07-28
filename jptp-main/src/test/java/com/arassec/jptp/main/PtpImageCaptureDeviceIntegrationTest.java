@@ -43,6 +43,8 @@ public class PtpImageCaptureDeviceIntegrationTest {
                 log.info("Capture image failed");
             }
             imageCaptureDevice.teardown();
+        } else {
+            log.error("No PTP device found!");
         }
     }
 

@@ -29,4 +29,12 @@ public record AccessCapability(UnsignedShort code, String description) {
         };
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "AccessCapability[code='" + String.format("0x%04X", code.value()) + "', description='" + description + "']";
+    }
+
 }

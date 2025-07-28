@@ -91,8 +91,16 @@ public record ResponseCode(UnsignedShort code, String description) {
             case 0x2021 -> INVALID_ENUM_HANDLE;
             case 0x2022 -> NO_STREAM_ENABLED;
             case 0x2023 -> INVALID_DATASET;
-            default -> new ResponseCode(code, "TODO");
+            default -> new ResponseCode(code, "Reserved / Vendor-defined");
         };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "ResponseCode[code='" + String.format("0x%04X", code.value()) + "', description='" + description + "']";
     }
 
 }

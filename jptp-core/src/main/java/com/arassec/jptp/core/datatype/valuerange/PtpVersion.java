@@ -23,7 +23,7 @@ public record PtpVersion(UnsignedShort version, String label) {
         return switch (version.value()) {
             case 100 -> V1_0;
             case 110 -> V1_1;
-            default -> new PtpVersion(version, "TODO");
+            default -> new PtpVersion(version, String.valueOf(version.value()));
         };
     }
 

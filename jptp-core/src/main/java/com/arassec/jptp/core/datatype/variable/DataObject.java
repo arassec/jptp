@@ -21,7 +21,6 @@ public record DataObject(byte[] data) implements PtpContainerPayload<DataObject>
      */
     @Override
     public DataObject deserialize(ByteBuffer buffer) {
-        // TODO: Check if necessary: buffer.position(12);
         ByteBuffer slicedBuffer = buffer.slice();
         byte[] bytes = new byte[slicedBuffer.remaining()];
         slicedBuffer.get(bytes);

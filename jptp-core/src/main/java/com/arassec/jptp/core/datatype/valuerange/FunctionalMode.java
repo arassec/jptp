@@ -23,8 +23,16 @@ public record FunctionalMode(UnsignedShort mode, String description) {
         return switch (mode.value()) {
             case 0x0000 -> STANDARD;
             case 0x0001 -> SLEEP;
-            default -> new FunctionalMode(mode, "TODO");
+            default -> new FunctionalMode(mode, "Reserved / Vendor-defined");
         };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "FunctionalMode[mode='" + String.format("0x%04X", mode.value()) + "', description='" + description + "']";
     }
 
 }

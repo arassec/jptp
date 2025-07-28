@@ -91,7 +91,7 @@ public record ObjectFormatCode(UnsignedShort code, char type, String format, Str
             case 0x380F -> JP2;
             case 0x3810 -> JPX;
             case 0x3811 -> DNG;
-            default -> new ObjectFormatCode(code, 'X', "TODO", "TODO");
+            default -> new ObjectFormatCode(code, 'X', "Undefined / Vendor-defined", "Reserved for future use / Vendor-defined");
         };
     }
 
@@ -108,6 +108,14 @@ public record ObjectFormatCode(UnsignedShort code, char type, String format, Str
             operationCodes.add(ObjectFormatCode.valueOf(UnsignedShort.deserialize(buffer)));
         }
         return operationCodes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "ObjectFormatCode[code='" + String.format("0x%04X", code.value()) + "', format='" + format + "']";
     }
 
 }

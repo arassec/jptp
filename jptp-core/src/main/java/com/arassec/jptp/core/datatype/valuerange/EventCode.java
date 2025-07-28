@@ -53,7 +53,7 @@ public record EventCode(UnsignedShort code, String name) {
             case 0x400C -> STORAGE_INFO_CHANGED;
             case 0x400D -> CAPTURE_COMPLETE;
             case 0x400E -> UNREPORTED_STATUS;
-            default -> new EventCode(code, "TODO");
+            default -> new EventCode(code, "Reserved / Vendor-defined");
         };
     }
 
@@ -70,6 +70,14 @@ public record EventCode(UnsignedShort code, String name) {
             eventCodes.add(EventCode.valueOf(UnsignedShort.deserialize(buffer)));
         }
         return eventCodes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "EventCode[code='" + String.format("0x%04X", code.value()) + "', name='" + name + "']";
     }
 
 }

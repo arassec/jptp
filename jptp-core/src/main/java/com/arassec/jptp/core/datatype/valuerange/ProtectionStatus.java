@@ -27,4 +27,12 @@ public record ProtectionStatus(UnsignedShort code, String description) {
         };
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "ProtectionStatus[code='" + String.format("0x%04X", code.value()) + "', description='" + description + "']";
+    }
+
 }

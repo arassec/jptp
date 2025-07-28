@@ -27,8 +27,15 @@ public record FilesystemType(UnsignedShort code, String description) {
             case 0x0001 -> GENERIC_FLAT;
             case 0x0002 -> GENERIC_HIERARCHICAL;
             case 0x0003 -> DCF;
-            default -> new FilesystemType(code, "TODO");
-        };
+            default -> new FilesystemType(code, "Reserved / Vendor-defined");        };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "FilesystemType[code='" + String.format("0x%04X", code.value()) + "', description='" + description + "']";
     }
 
 }

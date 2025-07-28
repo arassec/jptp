@@ -33,4 +33,12 @@ public record StorageType(UnsignedShort code, String type) {
         };
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "StorageType[code='" + String.format("0x%04X", code.value()) + "', type='" + type + "']";
+    }
+
 }

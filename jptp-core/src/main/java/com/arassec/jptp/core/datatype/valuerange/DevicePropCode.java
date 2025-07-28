@@ -114,7 +114,7 @@ public record DevicePropCode(UnsignedShort code, String name, PtpVersion ptpVers
             case 0x502A -> AUDIO_SAMPLING_RATE;
             case 0x502B -> AUDIO_BIT_PER_SAMPLE;
             case 0x502C -> AUDIO_VOLUME;
-            default -> new DevicePropCode(code, "TODO", PtpVersion.V1_0);
+            default -> new DevicePropCode(code, "Reserved / Vendor-defined", PtpVersion.V1_0);
         };
     }
 
@@ -130,6 +130,14 @@ public record DevicePropCode(UnsignedShort code, String name, PtpVersion ptpVers
             devicePropCodes.add(DevicePropCode.valueOf(UnsignedShort.deserialize(buffer)));
         }
         return devicePropCodes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "DevicePropCode[code='" + String.format("0x%04X", code.value()) + "', name='" + name + "']";
     }
 
 }

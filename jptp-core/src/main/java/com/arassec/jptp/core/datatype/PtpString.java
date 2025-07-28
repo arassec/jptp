@@ -16,15 +16,23 @@ public record PtpString(String value) {
      * @return A new {@link PtpString} instance containing the string value.
      */
     public static PtpString deserialize(ByteBuffer buffer) {
-        byte stringLength = buffer.get();
+        if (!buffer.hasRemaining()) {
+            return new PtpString("");
+        }
 
-        if (stringLength <= 0 || !buffer.hasRemaining()) {
+        byte stringLength = buffer.get();
+        if (stringLength <= 0) {
             return new PtpString("");
         }
 
         StringBuilder stringBuilder = new StringBuilder(stringLength);
         for (int i = 0; i < stringLength; i++) {
-            stringBuilder.append(buffer.getChar());
+            if (buffer.remaining() >= 2) {
+                stringBuilder.append(buffer.getChar());
+            } else if (buffer.hasRemaining()) {
+
+                stringBuilder.append(buffer.get());
+            }
         }
 
         // Remove null chars at the end!

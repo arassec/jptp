@@ -36,8 +36,16 @@ public record AssociationCode(UnsignedShort code, String type, String interpreta
             case 0x0005 -> VERTICAL_PANORAMIC;
             case 0x0006 -> TWO_D_PANORAMIC;
             case 0x0007 -> ANCILLARY_DATA;
-            default -> new AssociationCode(code, "TODO", "TODO");
+            default -> new AssociationCode(code, "Reserved / Vendor-defined", "Undefined / Vendor-defined");
         };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "AssociationCode[code='" + String.format("0x%04X", code.value()) + "', type='" + type + "']";
     }
 
 }
