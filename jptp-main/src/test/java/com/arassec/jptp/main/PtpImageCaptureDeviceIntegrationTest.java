@@ -34,6 +34,12 @@ public class PtpImageCaptureDeviceIntegrationTest {
     void testCaptureImage() throws IOException {
         ImageCaptureDevice imageCaptureDevice = new PtpImageCaptureDevice(new UsbPtpDeviceDiscovery());
 
+        // Execute two times to test LibUsb context renewal.
+        captureImage(imageCaptureDevice);
+        captureImage(imageCaptureDevice);
+    }
+
+    private void captureImage(ImageCaptureDevice imageCaptureDevice) throws IOException {
         if (imageCaptureDevice.initialize()) {
             Optional<DataObject> optionalDataObject = imageCaptureDevice.captureImage();
             if (optionalDataObject.isPresent()) {

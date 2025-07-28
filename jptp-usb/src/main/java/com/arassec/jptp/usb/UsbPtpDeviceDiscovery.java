@@ -48,6 +48,11 @@ public class UsbPtpDeviceDiscovery implements PtpDeviceDiscovery {
     private boolean initialized = false;
 
     /**
+     * LibUSB context.
+     */
+    private Context context;
+
+    /**
      * Creates a new, uninitialized instance.
      */
     public UsbPtpDeviceDiscovery() {
@@ -59,7 +64,8 @@ public class UsbPtpDeviceDiscovery implements PtpDeviceDiscovery {
     @Override
     public void initialize() {
         if (!initialized) {
-            executeAndVerify(() -> LibUsb.init(null), "Unable to initialize LibUsb");
+            context = new Context();
+            executeAndVerify(() -> LibUsb.init(context), "Unable to initialize LibUsb");
             initialized = true;
         }
     }
@@ -75,7 +81,7 @@ public class UsbPtpDeviceDiscovery implements PtpDeviceDiscovery {
 
         List<PtpDevice> ptpDevices = new ArrayList<>();
 
-        executeAndVerify(() -> LibUsb.getDeviceList(null, deviceList), "Unable to retrieve USB device list");
+        executeAndVerify(() -> LibUsb.getDeviceList(context, deviceList), "Unable to retrieve USB device list");
 
         deviceList.forEach(device -> {
 
@@ -99,7 +105,9 @@ public class UsbPtpDeviceDiscovery implements PtpDeviceDiscovery {
     public void teardown() {
         if (initialized) {
             LibUsb.freeDeviceList(deviceList, true);
-            LibUsb.exit(null);
+            LibUsb.exit(context);
+            context = null;
+            initialized = false;
         }
     }
 
