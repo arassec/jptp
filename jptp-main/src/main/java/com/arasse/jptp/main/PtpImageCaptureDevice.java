@@ -76,14 +76,22 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
                     selectedDeviceInfo = optionalDeviceInfo.get();
                     ptpDevice = device;
                     initialized = true;
-                    log.info("PTP device found and initialized: {} - {}", selectedDeviceInfo.manufacturer().value().value(),
-                            selectedDeviceInfo.model().value().value());
+                    log.info("PTP device found and initialized: {} - {}",
+                            selectedDeviceInfo.manufacturer(), selectedDeviceInfo.model());
                     return true;
                 }
             }
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isInitialized() {
+        return initialized;
     }
 
     /**
@@ -109,6 +117,7 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
 
             initialized = false;
             selectedDeviceInfo = null;
+            ptpDevice = null;
         }
     }
 
@@ -131,10 +140,6 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
     public Optional<DataObject> captureImage() {
         if (!initialized) {
             throw new IllegalStateException("Device has not been initialized!");
-        }
-
-        if (ptpDevice == null) {
-            throw new IllegalStateException("No PTP device available!");
         }
 
         existingObjects = getObjectHandles().handles();
@@ -161,7 +166,7 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
         ptpDevice.initialize();
 
         CommandResult<DeviceInfo> deviceInfoCommandResult = ptpDevice.sendCommand(
-                CommandContainer.newInstance(OperationCode.GET_DEVICE_INFO, ptpDevice.getSessionId(), ptpDevice.incrementTransactionId(), null, null, null),
+                CommandContainer.newInstance(OperationCode.GET_DEVICE_INFO, ptpDevice.getSessionId(), ptpDevice.incrementTransactionId()),
                 DeviceInfo.emptyInstance);
 
         if (deviceInfoCommandResult == null

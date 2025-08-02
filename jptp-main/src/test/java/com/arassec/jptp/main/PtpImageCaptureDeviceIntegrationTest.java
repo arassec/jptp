@@ -39,6 +39,12 @@ public class PtpImageCaptureDeviceIntegrationTest {
         captureImage(imageCaptureDevice);
     }
 
+    /**
+     * Captures an image.
+     *
+     * @param imageCaptureDevice The device to capture the image.
+     * @throws IOException In case of errors.
+     */
     private void captureImage(ImageCaptureDevice imageCaptureDevice) throws IOException {
         if (imageCaptureDevice.initialize()) {
             Optional<DataObject> optionalDataObject = imageCaptureDevice.captureImage();

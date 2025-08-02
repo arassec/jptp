@@ -22,6 +22,13 @@ public interface ImageCaptureDevice {
     boolean initialize();
 
     /**
+     * Returns whether the device has been initialized or not.
+     *
+     * @return {@code true} if the device is initialized, {@code false} otherwise.
+     */
+    boolean isInitialized();
+
+    /**
      * Frees acquired resources.
      */
     void teardown();

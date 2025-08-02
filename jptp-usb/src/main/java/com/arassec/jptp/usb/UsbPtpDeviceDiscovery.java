@@ -2,8 +2,6 @@ package com.arassec.jptp.usb;
 
 import com.arassec.jptp.core.PtpDevice;
 import com.arassec.jptp.core.PtpDeviceDiscovery;
-import com.arassec.jptp.core.datatype.variable.ObjectHandle;
-import com.arassec.jptp.core.datatype.variable.ObjectHandleArray;
 import com.arassec.jptp.usb.type.BulkInEndpointDescriptor;
 import com.arassec.jptp.usb.type.BulkOutEndpointDescriptor;
 import com.arassec.jptp.usb.type.InterruptEndpointDescriptor;
@@ -48,11 +46,6 @@ public class UsbPtpDeviceDiscovery implements PtpDeviceDiscovery {
     private boolean initialized = false;
 
     /**
-     * LibUSB context.
-     */
-    private Context context;
-
-    /**
      * Creates a new, uninitialized instance.
      */
     public UsbPtpDeviceDiscovery() {
@@ -64,8 +57,7 @@ public class UsbPtpDeviceDiscovery implements PtpDeviceDiscovery {
     @Override
     public void initialize() {
         if (!initialized) {
-            context = new Context();
-            executeAndVerify(() -> LibUsb.init(context), "Unable to initialize LibUsb");
+            executeAndVerify(() -> LibUsb.init(null), "Unable to initialize LibUsb");
             initialized = true;
         }
     }
@@ -81,7 +73,7 @@ public class UsbPtpDeviceDiscovery implements PtpDeviceDiscovery {
 
         List<PtpDevice> ptpDevices = new ArrayList<>();
 
-        executeAndVerify(() -> LibUsb.getDeviceList(context, deviceList), "Unable to retrieve USB device list");
+        executeAndVerify(() -> LibUsb.getDeviceList(null, deviceList), "Unable to retrieve USB device list");
 
         deviceList.forEach(device -> {
 
@@ -105,8 +97,7 @@ public class UsbPtpDeviceDiscovery implements PtpDeviceDiscovery {
     public void teardown() {
         if (initialized) {
             LibUsb.freeDeviceList(deviceList, true);
-            LibUsb.exit(context);
-            context = null;
+            LibUsb.exit(null);
             initialized = false;
         }
     }
