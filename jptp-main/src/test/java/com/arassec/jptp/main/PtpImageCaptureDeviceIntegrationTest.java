@@ -2,7 +2,7 @@ package com.arassec.jptp.main;
 
 import com.arasse.jptp.main.ImageCaptureDevice;
 import com.arasse.jptp.main.PtpImageCaptureDevice;
-import com.arassec.jptp.core.datatype.variable.DataObject;
+import com.arassec.jptp.core.datatype.payload.DataObject;
 import com.arassec.jptp.usb.UsbPtpDeviceDiscovery;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -14,11 +14,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * Integration test of the {@link ImageCaptureDevice} for manual use.
  */
 @Disabled("Only for manual tests.")
-public class PtpImageCaptureDeviceIntegrationTest {
+class PtpImageCaptureDeviceIntegrationTest {
 
     /**
      * Logger.
@@ -32,11 +34,17 @@ public class PtpImageCaptureDeviceIntegrationTest {
      */
     @Test
     void testCaptureImage() throws IOException {
+        Path testImage = Path.of("target/test.jpg");
+
+        Files.deleteIfExists(testImage);
+
         ImageCaptureDevice imageCaptureDevice = new PtpImageCaptureDevice(new UsbPtpDeviceDiscovery());
 
         // Execute two times to test LibUsb context renewal.
         captureImage(imageCaptureDevice);
         captureImage(imageCaptureDevice);
+
+        assertThat(Files.exists(testImage)).isTrue();
     }
 
     /**

@@ -30,7 +30,6 @@ public record PtpString(String value) {
             if (buffer.remaining() >= 2) {
                 stringBuilder.append(buffer.getChar());
             } else if (buffer.hasRemaining()) {
-
                 stringBuilder.append(buffer.get());
             }
         }

@@ -8,10 +8,11 @@ import com.arassec.jptp.core.container.CommandContainer;
 import com.arassec.jptp.core.container.DataContainer;
 import com.arassec.jptp.core.container.ResponseContainer;
 import com.arassec.jptp.core.datatype.UnsignedInt;
+import com.arassec.jptp.core.datatype.payload.*;
 import com.arassec.jptp.core.datatype.valuerange.OperationCode;
 import com.arassec.jptp.core.datatype.valuerange.PtpVersion;
 import com.arassec.jptp.core.datatype.valuerange.ResponseCode;
-import com.arassec.jptp.core.datatype.variable.*;
+import com.arassec.jptp.core.datatype.simple.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -169,6 +170,18 @@ class PtpImageCaptureDeviceTest {
 
         assertThat(dataObject).isPresent();
         assertThat(dataObject.get().data()).isEqualTo(new byte[]{1, 2, 3, 4});
+    }
+
+    /**
+     * Tests getting device info.
+     */
+    @Test
+    void testGetDeviceInfo() {
+        assertThat(imageCaptureDevice.getDeviceInfo()).isEmpty();
+
+        assertThat(imageCaptureDevice.initialize()).isTrue();
+
+        assertThat(imageCaptureDevice.getDeviceInfo()).isNotEmpty();
     }
 
     /**

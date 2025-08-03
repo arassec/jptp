@@ -60,6 +60,7 @@ public record OperationCode(UnsignedShort code, String name, PtpVersion ptpVersi
      * @param code The code to use.
      * @return An {@link OperationCode} instance for the given code.
      */
+    @SuppressWarnings("java:S1479") // The number of switch cases will be reduced.
     public static OperationCode valueOf(UnsignedShort code) {
         return switch (code.value()) {
             case 0x1000 -> UNDEFINED;

@@ -4,10 +4,12 @@ package com.arassec.jptp.usb;
 import com.arassec.jptp.core.PtpDevice;
 import com.arassec.jptp.core.container.CommandContainer;
 import com.arassec.jptp.core.container.ResponseContainer;
+import com.arassec.jptp.core.datatype.payload.*;
+import com.arassec.jptp.core.datatype.simple.CommandResult;
+import com.arassec.jptp.core.datatype.simple.StorageId;
 import com.arassec.jptp.core.datatype.valuerange.ObjectFormatCode;
 import com.arassec.jptp.core.datatype.valuerange.OperationCode;
 import com.arassec.jptp.core.datatype.valuerange.ResponseCode;
-import com.arassec.jptp.core.datatype.variable.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -33,6 +35,9 @@ class UsbPtpIntegrationTest {
      */
     private final Logger log = LoggerFactory.getLogger(UsbPtpIntegrationTest.class);
 
+    /**
+     * Test getting device info.
+     */
     @Test
     void testGetDeviceInfo() {
         UsbPtpDeviceDiscovery deviceDiscovery = new UsbPtpDeviceDiscovery();
@@ -56,6 +61,9 @@ class UsbPtpIntegrationTest {
         deviceDiscovery.teardown();
     }
 
+    /**
+     * Tests session management.
+     */
     @Test
     void testSessionManagement() {
         UsbPtpDeviceDiscovery deviceDiscovery = new UsbPtpDeviceDiscovery();

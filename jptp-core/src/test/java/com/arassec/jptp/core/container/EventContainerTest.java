@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the {@link EventContainer}.
  */
-public class EventContainerTest extends BaseContainerTest {
+class EventContainerTest extends BaseContainerTest {
 
     /**
      * Tests deserializing an event container.

@@ -5,9 +5,13 @@ import com.arassec.jptp.core.PtpDeviceDiscovery;
 import com.arassec.jptp.core.container.CommandContainer;
 import com.arassec.jptp.core.container.ResponseContainer;
 import com.arassec.jptp.core.datatype.UnsignedInt;
+import com.arassec.jptp.core.datatype.payload.DataObject;
+import com.arassec.jptp.core.datatype.payload.DeviceInfo;
+import com.arassec.jptp.core.datatype.payload.ObjectHandle;
+import com.arassec.jptp.core.datatype.payload.ObjectHandleArray;
 import com.arassec.jptp.core.datatype.valuerange.OperationCode;
 import com.arassec.jptp.core.datatype.valuerange.ResponseCode;
-import com.arassec.jptp.core.datatype.variable.*;
+import com.arassec.jptp.core.datatype.simple.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,10 +113,7 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
                 throw new IllegalStateException("Could not close PTP session!");
             }
 
-            if (ptpDevice != null) {
-                ptpDevice.teardown();
-            }
-
+            ptpDevice.teardown();
             ptpDeviceDiscovery.teardown();
 
             initialized = false;
@@ -127,7 +128,7 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
     @Override
     public Optional<DeviceInfo> getDeviceInfo() {
         if (!initialized) {
-            throw new IllegalStateException("Device has not been initialized!");
+            return Optional.empty();
         }
 
         return Optional.ofNullable(selectedDeviceInfo);

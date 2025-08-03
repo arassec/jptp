@@ -53,6 +53,7 @@ public record ResponseCode(UnsignedShort code, String description) {
      * @param code The code to use.
      * @return A {@link ResponseCode} for the given code.
      */
+    @SuppressWarnings("java:S1479") // The number of switch cases will be reduced.
     public static ResponseCode valueOf(UnsignedShort code) {
         return switch (code.value()) {
             case 0x2000 -> UNDEFINED;

@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the {@link DataContainer}.
  */
-public class DataContainerTest extends BaseContainerTest {
+class DataContainerTest extends BaseContainerTest {
 
     /**
      * Tests deserializing a data container.

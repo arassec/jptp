@@ -49,6 +49,7 @@ public class UsbPtpDeviceDiscovery implements PtpDeviceDiscovery {
      * Creates a new, uninitialized instance.
      */
     public UsbPtpDeviceDiscovery() {
+        // JavaDoc-Plugin demands this...
     }
 
     /**

@@ -3,8 +3,8 @@ package com.arassec.jptp.core.container;
 import com.arassec.jptp.core.datatype.UnsignedInt;
 import com.arassec.jptp.core.datatype.valuerange.ContainerType;
 import com.arassec.jptp.core.datatype.valuerange.OperationCode;
-import com.arassec.jptp.core.datatype.variable.SessionId;
-import com.arassec.jptp.core.datatype.variable.TransactionId;
+import com.arassec.jptp.core.datatype.simple.SessionId;
+import com.arassec.jptp.core.datatype.simple.TransactionId;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

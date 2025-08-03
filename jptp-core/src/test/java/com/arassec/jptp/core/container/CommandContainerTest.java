@@ -2,18 +2,16 @@ package com.arassec.jptp.core.container;
 
 import com.arassec.jptp.core.datatype.UnsignedInt;
 import com.arassec.jptp.core.datatype.valuerange.OperationCode;
-import com.arassec.jptp.core.datatype.variable.SessionId;
-import com.arassec.jptp.core.datatype.variable.TransactionId;
+import com.arassec.jptp.core.datatype.simple.SessionId;
+import com.arassec.jptp.core.datatype.simple.TransactionId;
 import org.junit.jupiter.api.Test;
-
-import java.nio.ByteBuffer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests the {@link CommandContainer}.
  */
-public class CommandContainerTest extends BaseContainerTest {
+class CommandContainerTest extends BaseContainerTest {
 
     /**
      * Tests creating instances with the various helper methods and serialization of the resulting

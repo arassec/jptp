@@ -67,6 +67,7 @@ public record DevicePropCode(UnsignedShort code, String name, PtpVersion ptpVers
      * @param code The code to use.
      * @return A {@link DevicePropCode} instance for the given code.
      */
+    @SuppressWarnings("java:S1479") // The number of switch cases will be reduced.
     public static DevicePropCode valueOf(UnsignedShort code) {
         return switch (code.value()) {
             case 0x5000 -> UNDEFINED;

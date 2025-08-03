@@ -2,9 +2,9 @@ package com.arassec.jptp.core;
 
 import com.arassec.jptp.core.container.CommandContainer;
 import com.arassec.jptp.core.container.EventContainer;
-import com.arassec.jptp.core.datatype.variable.CommandResult;
-import com.arassec.jptp.core.datatype.variable.SessionId;
-import com.arassec.jptp.core.datatype.variable.TransactionId;
+import com.arassec.jptp.core.datatype.simple.CommandResult;
+import com.arassec.jptp.core.datatype.simple.SessionId;
+import com.arassec.jptp.core.datatype.simple.TransactionId;
 
 /**
  * Defines a PTP device.
@@ -59,6 +59,7 @@ public interface PtpDevice {
      * @param <P>             The type of the expected event payload.
      * @return An {@link EventContainer} containing the received data.
      */
+    @SuppressWarnings("unused")
     <P extends PtpContainerPayload<P>> EventContainer<P> pollForEvent(P payloadInstance);
 
     /**
@@ -66,6 +67,7 @@ public interface PtpDevice {
      *
      * @param defaultTimeoutInMillis The timeout to use.
      */
+    @SuppressWarnings("unused")
     void setDefaultTimeoutInMillis(long defaultTimeoutInMillis);
 
     /**
@@ -73,6 +75,7 @@ public interface PtpDevice {
      *
      * @param eventTimeoutInMillis The timeout to use.
      */
+    @SuppressWarnings("unused")
     void setEventTimeoutInMillis(long eventTimeoutInMillis);
 
 }
