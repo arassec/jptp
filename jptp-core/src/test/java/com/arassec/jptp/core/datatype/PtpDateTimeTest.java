@@ -7,7 +7,6 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -40,9 +39,8 @@ class PtpDateTimeTest {
 
         PtpDateTime ptpDateTime = PtpDateTime.deserialize(buffer);
 
-        assertThat(ptpDateTime.dateTime()).isEqualTo(
-                OffsetDateTime.ofInstant(now.toInstant(ZoneOffset.UTC), ZoneId.of("UTC")).withNano(0)
-        );
+        assertThat(ptpDateTime.dateTime().toInstant())
+                .isEqualTo(now.withNano(0).toInstant(ZoneOffset.UTC));
     }
 
     /**
@@ -53,7 +51,7 @@ class PtpDateTimeTest {
         OffsetDateTime now = OffsetDateTime.now();
 
         DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                .appendPattern("yyyyMMdd'T'HHmmss.s+0200")
+                .appendPattern("yyyyMMdd'T'HHmmss.ssZ")
                 .toFormatter();
 
         byte[] bytes = formatter.format(now).getBytes(StandardCharsets.UTF_16LE);
@@ -66,7 +64,8 @@ class PtpDateTimeTest {
 
         PtpDateTime ptpDateTime = PtpDateTime.deserialize(buffer);
 
-        assertThat(ptpDateTime.dateTime()).isEqualTo(now.withNano(0));
+        assertThat(ptpDateTime.dateTime().toInstant())
+                .isEqualTo(now.withNano(0).toInstant());
     }
 
 }

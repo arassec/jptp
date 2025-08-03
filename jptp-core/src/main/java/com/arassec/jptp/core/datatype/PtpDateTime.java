@@ -23,7 +23,7 @@ public record PtpDateTime(OffsetDateTime dateTime) {
             .appendPattern(".s")
             .optionalEnd()
             .optionalStart()
-            .appendPattern("xx") // Zeitzone: Z, +02:00, -07:00
+            .appendPattern("xx") // Zeitzone: Z, +0200, -0700
             .optionalEnd()
             .toFormatter();
 
