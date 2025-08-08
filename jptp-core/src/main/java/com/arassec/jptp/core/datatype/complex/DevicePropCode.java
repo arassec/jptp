@@ -125,9 +125,10 @@ public record DevicePropCode(UnsignedShort code, String name, Version ptpVersion
      * @param buffer The {@link ByteBuffer} containing the PTP array of codes.
      * @return A list of {@link DevicePropCode} instances for the given codes.
      */
-    public static List<DevicePropCode> deserializesArray(ByteBuffer buffer) {
+    public static List<DevicePropCode> deserializeArray(ByteBuffer buffer) {
         List<DevicePropCode> devicePropCodes = new ArrayList<>();
-        for (int i = 0; i < buffer.getInt(); i++) {
+        int arrayLength = buffer.getInt();
+        for (int i = 0; i < arrayLength; i++) {
             devicePropCodes.add(DevicePropCode.valueOf(UnsignedShort.deserialize(buffer)));
         }
         return devicePropCodes;

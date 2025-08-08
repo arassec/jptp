@@ -54,7 +54,7 @@ public record DeviceInfo(
                     FunctionalMode.valueOf(UnsignedShort.deserialize(buffer)),
                     OperationCode.deserializeArray(buffer),
                     EventCode.deserializeArray(buffer),
-                    DevicePropCode.deserializesArray(buffer),
+                    DevicePropCode.deserializeArray(buffer),
                     ObjectFormatCode.deserializeArray(buffer),
                     ObjectFormatCode.deserializeArray(buffer),
                     new Manufacturer(PtpString.deserialize(buffer)),

@@ -28,6 +28,7 @@ public record PtpString(String value) {
         StringBuilder stringBuilder = new StringBuilder(stringLength);
         for (int i = 0; i < stringLength; i++) {
             if (buffer.remaining() >= 2) {
+                i++;
                 stringBuilder.append(buffer.getChar());
             } else if (buffer.hasRemaining()) {
                 stringBuilder.append(buffer.get());
