@@ -14,6 +14,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PtpStringTest {
 
     /**
+     * Tests deserializing an empty buffer.
+     */
+    @Test
+    void testDeserializeEmptyBuffer() {
+        assertThat(PtpString.deserialize(ByteBuffer.allocate(0))).isEqualTo(new PtpString(""));
+
+        ByteBuffer buffer = ByteBuffer.allocate(1).order(ByteOrder.LITTLE_ENDIAN);
+        buffer.put((byte) 0);
+        assertThat(PtpString.deserialize(buffer)).isEqualTo(new PtpString(""));
+    }
+
+    /**
      * Tests deserialization.
      */
     @Test
