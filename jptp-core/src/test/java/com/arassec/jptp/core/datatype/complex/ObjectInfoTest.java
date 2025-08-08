@@ -72,13 +72,13 @@ class ObjectInfoTest {
         buffer.putShort(expectedObjectInfo.associationType().code().value());
         buffer.putInt(expectedObjectInfo.associationDesc().desc().value());
         buffer.putInt(expectedObjectInfo.sequenceNumber().number().value());
-        buffer.put((byte) 8); // String length, two bytes per character!
+        buffer.put((byte) 4); // String length, number of characters in the string!
         buffer.put("test".getBytes(StandardCharsets.UTF_16LE));
-        buffer.put((byte) 30); // Formatted date length
+        buffer.put((byte) 15); // Formatted date length
         buffer.put(dtf.format(expectedObjectInfo.captureDate().date().dateTime()).getBytes(StandardCharsets.UTF_16LE));
-        buffer.put((byte) 30); // Formatted date length
+        buffer.put((byte) 15); // Formatted date length
         buffer.put(dtf.format(expectedObjectInfo.modificationDate().date().dateTime()).getBytes(StandardCharsets.UTF_16LE));
-        buffer.put((byte) 14); // String length, two bytes per character!
+        buffer.put((byte) 7); // String length, number of characters in the string!
         buffer.put("keyword".getBytes(StandardCharsets.UTF_16LE));
         buffer.rewind();
 

@@ -43,7 +43,7 @@ class DeviceInfoTest {
         buffer.putShort(expectedDeviceInfo.standardVersion().version().value());
         buffer.putInt(expectedDeviceInfo.vendorExtensionId().id().value());
         buffer.putShort(expectedDeviceInfo.vendorExtensionVersion().version().value());
-        buffer.put((byte) 8); // String length, two bytes per character!
+        buffer.put((byte) 4); // String length, number of characters in the string!
         buffer.put("desc".getBytes(StandardCharsets.UTF_16LE));
         buffer.putShort(expectedDeviceInfo.functionalMode().mode().value());
         buffer.putInt(1); // Array size
@@ -56,13 +56,13 @@ class DeviceInfoTest {
         buffer.putShort(expectedDeviceInfo.captureFormats().getFirst().code().value());
         buffer.putInt(1); // Array size
         buffer.putShort(expectedDeviceInfo.imageFormats().getFirst().code().value());
-        buffer.put((byte) 8); // String length, two bytes per character!
+        buffer.put((byte) 4); // String length, number of characters in the string!
         buffer.put("manu".getBytes(StandardCharsets.UTF_16LE));
-        buffer.put((byte) 10); // String length, two bytes per character!
+        buffer.put((byte) 5); // String length, number of characters in the string!
         buffer.put("model".getBytes(StandardCharsets.UTF_16LE));
-        buffer.put((byte) 6); // String length, two bytes per character!
+        buffer.put((byte) 3); // String length, number of characters in the string!
         buffer.put("101".getBytes(StandardCharsets.UTF_16LE));
-        buffer.put((byte) 12); // String length, two bytes per character!
+        buffer.put((byte) 6); // String length, number of characters in the string!
         buffer.put("serial".getBytes(StandardCharsets.UTF_16LE));
         buffer.rewind();
 

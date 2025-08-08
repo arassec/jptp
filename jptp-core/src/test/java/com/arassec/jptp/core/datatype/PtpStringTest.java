@@ -33,7 +33,7 @@ class PtpStringTest {
         byte[] bytes = "jptp PtpStringTest".getBytes(StandardCharsets.UTF_16LE);
 
         ByteBuffer buffer = ByteBuffer.allocate(bytes.length + 3).order(ByteOrder.LITTLE_ENDIAN);
-        buffer.put((byte) bytes.length);
+        buffer.put((byte) 18);
         buffer.put(bytes);
         buffer.put("\u0000".getBytes(StandardCharsets.UTF_16LE));
         buffer.rewind();

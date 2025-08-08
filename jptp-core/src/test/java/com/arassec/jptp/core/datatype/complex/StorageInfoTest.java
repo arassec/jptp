@@ -39,9 +39,9 @@ class StorageInfoTest {
         buffer.putLong(expectedStorageInfo.maxCapacity().capacity().value());
         buffer.putLong(expectedStorageInfo.freeSpaceInBytes().freeSpace().value());
         buffer.putInt(expectedStorageInfo.freeSpaceInImages().freeSpace().value());
-        buffer.put((byte) 8); // String length, two bytes per character!
+        buffer.put((byte) 4); // String length, number of characters in the string!
         buffer.put("desc".getBytes(StandardCharsets.UTF_16LE));
-        buffer.put((byte) 10); // String length, two bytes per character!
+        buffer.put((byte) 5); // String length, number of characters in the string!
         buffer.put("label".getBytes(StandardCharsets.UTF_16LE));
         buffer.rewind();
 
