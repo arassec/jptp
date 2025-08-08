@@ -4,12 +4,7 @@ package com.arassec.jptp.usb;
 import com.arassec.jptp.core.PtpDevice;
 import com.arassec.jptp.core.container.CommandContainer;
 import com.arassec.jptp.core.container.ResponseContainer;
-import com.arassec.jptp.core.datatype.payload.*;
-import com.arassec.jptp.core.datatype.simple.CommandResult;
-import com.arassec.jptp.core.datatype.simple.StorageId;
-import com.arassec.jptp.core.datatype.valuerange.ObjectFormatCode;
-import com.arassec.jptp.core.datatype.valuerange.OperationCode;
-import com.arassec.jptp.core.datatype.valuerange.ResponseCode;
+import com.arassec.jptp.core.datatype.complex.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -49,8 +44,8 @@ class UsbPtpIntegrationTest {
             ptpDevice.initialize();
 
             CommandResult<DeviceInfo> commandResult = ptpDevice.sendCommand(
-                    CommandContainer.newInstance(OperationCode.GET_DEVICE_INFO, ptpDevice.getSessionId(), ptpDevice.incrementTransactionId(), null, null, null),
-                    DeviceInfo.emptyInstance);
+                    CommandContainer.newInstance(OperationCode.GET_DEVICE_INFO, ptpDevice.getSessionId(), ptpDevice.incrementTransactionId()),
+                    DeviceInfo.DESERIALIZER);
 
             log.info("Data from PTP device: {}", commandResult.dataContainer());
             log.info("Response from PTP device: {}", commandResult.responseContainer());
@@ -88,21 +83,21 @@ class UsbPtpIntegrationTest {
 
             try {
                 CommandContainer getStorageIdsCommand = CommandContainer.newInstance(OperationCode.GET_STORAGE_IDS, null, ptpDevice.incrementTransactionId());
-                CommandResult<StorageIdArray> storageIdArrayCommandResult = ptpDevice.sendCommand(getStorageIdsCommand, StorageIdArray.emptyInstance);
+                CommandResult<StorageIdArray> storageIdArrayCommandResult = ptpDevice.sendCommand(getStorageIdsCommand, StorageIdArray.DESERIALIZER);
 
                 StorageId storageId = storageIdArrayCommandResult.dataContainer().payload().ids().getFirst();
 
                 CommandContainer getStorageInfoCommand = CommandContainer.newInstance(OperationCode.GET_STORAGE_INFO, null, ptpDevice.incrementTransactionId(), storageId.id());
-                CommandResult<StorageInfo> storageInfoCommandResult = ptpDevice.sendCommand(getStorageInfoCommand, StorageInfo.emptyInstance);
+                CommandResult<StorageInfo> storageInfoCommandResult = ptpDevice.sendCommand(getStorageInfoCommand, StorageInfo.DESERIALIZER);
                 log.info("Storage type: {}", storageInfoCommandResult.dataContainer().payload().storageType());
 
                 CommandContainer getObjectHandlesCommand = CommandContainer.newInstance(OperationCode.GET_OBJECT_HANDLES, null, ptpDevice.incrementTransactionId(), storageId.id());
-                CommandResult<ObjectHandleArray> objectHandlesCommandResult = ptpDevice.sendCommand(getObjectHandlesCommand, ObjectHandleArray.emptyInstance);
+                CommandResult<ObjectHandleArray> objectHandlesCommandResult = ptpDevice.sendCommand(getObjectHandlesCommand, ObjectHandleArray.DESERIALIZER);
 
                 ObjectHandle objectHandle = null;
                 for (ObjectHandle possibleObjectHandle : objectHandlesCommandResult.dataContainer().payload().handles()) {
                     CommandContainer getObjectInfoCommand = CommandContainer.newInstance(OperationCode.GET_OBJECT_INFO, null, ptpDevice.incrementTransactionId(), possibleObjectHandle.handle());
-                    CommandResult<ObjectInfo> objectInfoCommandResult = ptpDevice.sendCommand(getObjectInfoCommand, ObjectInfo.emptyInstance);
+                    CommandResult<ObjectInfo> objectInfoCommandResult = ptpDevice.sendCommand(getObjectInfoCommand, ObjectInfo.DESERIALIZER);
 
                     if (ObjectFormatCode.EXIF_JPEG.equals(objectInfoCommandResult.dataContainer().payload().objectFormat())) {
                         log.info("File found: {}", objectInfoCommandResult.dataContainer().payload().filename().name().value());
@@ -113,7 +108,7 @@ class UsbPtpIntegrationTest {
 
                 if (objectHandle != null) {
                     CommandContainer getObjectCommand = CommandContainer.newInstance(OperationCode.GET_OBJECT, null, ptpDevice.incrementTransactionId(), objectHandle.handle());
-                    CommandResult<DataObject> objectCommandResult = ptpDevice.sendCommand(getObjectCommand, DataObject.emptyInstance);
+                    CommandResult<DataObject> objectCommandResult = ptpDevice.sendCommand(getObjectCommand, DataObject.DESERIALIZER);
 
                     try {
                         Files.write(Path.of("target/test.jpg"), objectCommandResult.dataContainer().payload().data());

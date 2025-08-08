@@ -1,17 +1,17 @@
 package com.arassec.jptp.usb;
 
-import com.arassec.jptp.core.PtpContainerPayload;
+import com.arassec.jptp.core.PayloadDeserializer;
 import com.arassec.jptp.core.PtpDevice;
 import com.arassec.jptp.core.container.CommandContainer;
 import com.arassec.jptp.core.container.DataContainer;
 import com.arassec.jptp.core.container.EventContainer;
 import com.arassec.jptp.core.container.ResponseContainer;
+import com.arassec.jptp.core.datatype.ContainerType;
 import com.arassec.jptp.core.datatype.UnsignedInt;
 import com.arassec.jptp.core.datatype.UnsignedShort;
-import com.arassec.jptp.core.datatype.valuerange.ContainerType;
-import com.arassec.jptp.core.datatype.simple.CommandResult;
-import com.arassec.jptp.core.datatype.simple.SessionId;
-import com.arassec.jptp.core.datatype.simple.TransactionId;
+import com.arassec.jptp.core.datatype.complex.CommandResult;
+import com.arassec.jptp.core.datatype.complex.SessionId;
+import com.arassec.jptp.core.datatype.complex.TransactionId;
 import com.arassec.jptp.usb.type.BulkInEndpointDescriptor;
 import com.arassec.jptp.usb.type.BulkOutEndpointDescriptor;
 import com.arassec.jptp.usb.type.InterruptEndpointDescriptor;
@@ -158,7 +158,7 @@ public class UsbPtpDevice implements PtpDevice {
      * {@inheritDoc}
      */
     @Override
-    public <P extends PtpContainerPayload<P>> CommandResult<P> sendCommand(CommandContainer container, P payloadInstance) {
+    public <P> CommandResult<P> sendCommand(CommandContainer container, PayloadDeserializer<P> payloadDeserializer) {
         if (!initialized) {
             throw new IllegalStateException("UsbPtpDevice has not been initialized!");
         }
@@ -178,14 +178,14 @@ public class UsbPtpDevice implements PtpDevice {
         ResponseContainer responseContainer;
 
         if (ContainerType.DATA.equals(getContainerType(responseBuffer))) {
-            dataContainer = DataContainer.deserialize(responseBuffer, payloadInstance);
+            dataContainer = DataContainer.deserialize(responseBuffer, payloadDeserializer);
             responseBuffer = readDataAndResponse(true, bEndpointAddress, capacity, defaultTimeoutInMillis);
             responseContainer = ResponseContainer.deserialize(responseBuffer);
         } else if (ContainerType.RESPONSE.equals(getContainerType(responseBuffer))) {
             responseContainer = ResponseContainer.deserialize(responseBuffer);
-            if (payloadInstance != null) {
+            if (payloadDeserializer != null) {
                 responseBuffer = readDataAndResponse(true, bEndpointAddress, capacity, defaultTimeoutInMillis);
-                dataContainer = DataContainer.deserialize(responseBuffer, payloadInstance);
+                dataContainer = DataContainer.deserialize(responseBuffer, payloadDeserializer);
             }
         } else {
             throw new IllegalStateException("Unexpected container type received: " + getContainerType(responseBuffer));
@@ -203,7 +203,7 @@ public class UsbPtpDevice implements PtpDevice {
      * {@inheritDoc}
      */
     @Override
-    public <P extends PtpContainerPayload<P>> EventContainer<P> pollForEvent(P payloadInstance) {
+    public <P> EventContainer<P> pollForEvent(PayloadDeserializer<P> payloadDeserializer) {
         ByteBuffer responseBuffer = readDataAndResponse(false, interruptIn.descriptor().bEndpointAddress(),
                 interruptIn.descriptor().wMaxPacketSize(), eventTimeoutInMillis);
 
@@ -211,7 +211,7 @@ public class UsbPtpDevice implements PtpDevice {
             throw new IllegalStateException("Unexpected container type received: " + getContainerType(responseBuffer));
         }
 
-        return EventContainer.deserialize(responseBuffer, payloadInstance);
+        return EventContainer.deserialize(responseBuffer, payloadDeserializer);
     }
 
     /**

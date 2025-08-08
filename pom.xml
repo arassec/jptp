@@ -53,7 +53,7 @@
         <sonar.organization>arassec</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <!-- usb4java uses JNI with 'native' methods which can't be mocked. -->
-        <sonar.coverage.exclusions>jptp-usb/**,jptp-core/**/core/datatype/simple/**</sonar.coverage.exclusions>
+        <sonar.coverage.exclusions>jptp-usb/**</sonar.coverage.exclusions>
 
         <!-- Versions -->
         <mockito.version>5.18.0</mockito.version>

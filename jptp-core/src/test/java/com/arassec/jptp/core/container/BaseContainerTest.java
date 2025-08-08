@@ -1,6 +1,6 @@
 package com.arassec.jptp.core.container;
 
-import com.arassec.jptp.core.PtpContainerPayload;
+import com.arassec.jptp.core.PayloadDeserializer;
 
 import java.nio.ByteBuffer;
 
@@ -28,7 +28,7 @@ public abstract class BaseContainerTest {
     /**
      * Container payload for testing.
      */
-    protected static class DummyPayload implements PtpContainerPayload<DummyPayload> {
+    protected static class DummyPayload implements PayloadDeserializer<DummyPayload> {
 
         /**
          * {@inheritDoc}

@@ -5,13 +5,7 @@ import com.arassec.jptp.core.PtpDeviceDiscovery;
 import com.arassec.jptp.core.container.CommandContainer;
 import com.arassec.jptp.core.container.ResponseContainer;
 import com.arassec.jptp.core.datatype.UnsignedInt;
-import com.arassec.jptp.core.datatype.payload.DataObject;
-import com.arassec.jptp.core.datatype.payload.DeviceInfo;
-import com.arassec.jptp.core.datatype.payload.ObjectHandle;
-import com.arassec.jptp.core.datatype.payload.ObjectHandleArray;
-import com.arassec.jptp.core.datatype.valuerange.OperationCode;
-import com.arassec.jptp.core.datatype.valuerange.ResponseCode;
-import com.arassec.jptp.core.datatype.simple.*;
+import com.arassec.jptp.core.datatype.complex.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,7 +162,7 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
 
         CommandResult<DeviceInfo> deviceInfoCommandResult = ptpDevice.sendCommand(
                 CommandContainer.newInstance(OperationCode.GET_DEVICE_INFO, ptpDevice.getSessionId(), ptpDevice.incrementTransactionId()),
-                DeviceInfo.emptyInstance);
+                DeviceInfo.DESERIALIZER);
 
         if (deviceInfoCommandResult == null
                 || deviceInfoCommandResult.responseContainer() == null
@@ -220,7 +214,7 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
 
                 CommandResult<DataObject> result = ptpDevice.sendCommand(
                         CommandContainer.newInstance(OperationCode.GET_OBJECT, null, ptpDevice.incrementTransactionId(), newestObject.get().handle()),
-                        DataObject.emptyInstance);
+                        DataObject.DESERIALIZER);
                 if (!ResponseCode.OK.equals(result.responseContainer().responseCode())) {
                     throw new IllegalStateException("Could not get captured image!");
                 }
@@ -267,7 +261,7 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
      */
     private ObjectHandleArray getObjectHandles() {
         CommandContainer getObjectHandlesCommand = CommandContainer.newInstance(OperationCode.GET_OBJECT_HANDLES, null, ptpDevice.incrementTransactionId(), UnsignedInt.maxInstance());
-        CommandResult<ObjectHandleArray> result = ptpDevice.sendCommand(getObjectHandlesCommand, ObjectHandleArray.emptyInstance);
+        CommandResult<ObjectHandleArray> result = ptpDevice.sendCommand(getObjectHandlesCommand, ObjectHandleArray.DESERIALIZER);
         if (!ResponseCode.OK.equals(result.responseContainer().responseCode())) {
             throw new IllegalStateException("Could not load object handles!");
         }

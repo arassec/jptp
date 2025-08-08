@@ -1,11 +1,11 @@
 package com.arassec.jptp.core.container;
 
-import com.arassec.jptp.core.PtpContainerPayload;
+import com.arassec.jptp.core.PayloadDeserializer;
+import com.arassec.jptp.core.datatype.ContainerType;
 import com.arassec.jptp.core.datatype.UnsignedInt;
 import com.arassec.jptp.core.datatype.UnsignedShort;
-import com.arassec.jptp.core.datatype.valuerange.ContainerType;
-import com.arassec.jptp.core.datatype.valuerange.EventCode;
-import com.arassec.jptp.core.datatype.simple.TransactionId;
+import com.arassec.jptp.core.datatype.complex.EventCode;
+import com.arassec.jptp.core.datatype.complex.TransactionId;
 
 import java.nio.ByteBuffer;
 
@@ -19,7 +19,7 @@ import java.nio.ByteBuffer;
  * @param payload       The payload of the event.
  * @param <P>           The type of the event's payload.
  */
-public record EventContainer<P extends PtpContainerPayload<P>>(
+public record EventContainer<P>(
         UnsignedInt length,
         ContainerType containerType,
         EventCode eventCode,
@@ -29,18 +29,18 @@ public record EventContainer<P extends PtpContainerPayload<P>>(
     /**
      * Deserializes the event container from the supplied byte buffer.
      *
-     * @param buffer          The {@link ByteBuffer} containing the event container.
-     * @param payloadInstance An instance of the event's payload. Used to deserialize the actual payload.
-     * @param <P>             The type of the payload.
+     * @param buffer              The {@link ByteBuffer} containing the event container.
+     * @param payloadDeserializer A deserializer for the event's payload.
+     * @param <P>                 The type of the payload.
      * @return A new {@link EventContainer} instance containing all data from the byte buffer.
      */
-    public static <P extends PtpContainerPayload<P>> EventContainer<P> deserialize(ByteBuffer buffer, P payloadInstance) {
+    public static <P> EventContainer<P> deserialize(ByteBuffer buffer, PayloadDeserializer<P> payloadDeserializer) {
         return new EventContainer<>(
                 UnsignedInt.deserialize(buffer),
                 ContainerType.valueOf(UnsignedShort.deserialize(buffer)),
                 EventCode.valueOf(UnsignedShort.deserialize(buffer)),
                 new TransactionId(UnsignedInt.deserialize(buffer)),
-                payloadInstance.deserialize(buffer)
+                payloadDeserializer.deserialize(buffer)
         );
     }
 

@@ -2,9 +2,9 @@ package com.arassec.jptp.core;
 
 import com.arassec.jptp.core.container.CommandContainer;
 import com.arassec.jptp.core.container.EventContainer;
-import com.arassec.jptp.core.datatype.simple.CommandResult;
-import com.arassec.jptp.core.datatype.simple.SessionId;
-import com.arassec.jptp.core.datatype.simple.TransactionId;
+import com.arassec.jptp.core.datatype.complex.CommandResult;
+import com.arassec.jptp.core.datatype.complex.SessionId;
+import com.arassec.jptp.core.datatype.complex.TransactionId;
 
 /**
  * Defines a PTP device.
@@ -45,22 +45,22 @@ public interface PtpDevice {
     /**
      * Sends a command to the PTP device.
      *
-     * @param container       The command container to send.
-     * @param payloadInstance An instance of the payload, which will be received in the response to the command.
-     * @param <P>             The type of the expected response payload.
+     * @param container           The command container to send.
+     * @param payloadDeserializer A deserializer for the expected payload data.
+     * @param <P>                 The type of the expected response payload.
      * @return A {@link CommandResult} containing a response container and an optional data container.
      */
-    <P extends PtpContainerPayload<P>> CommandResult<P> sendCommand(CommandContainer container, P payloadInstance);
+    <P> CommandResult<P> sendCommand(CommandContainer container, PayloadDeserializer<P> payloadDeserializer);
 
     /**
      * Polls for events from the PTP device.
      *
-     * @param payloadInstance An instance of the payload, which will be received in the event.
-     * @param <P>             The type of the expected event payload.
+     * @param payloadDeserializer A deserializer for the event's payload data.
+     * @param <P>                 The type of the expected event payload.
      * @return An {@link EventContainer} containing the received data.
      */
     @SuppressWarnings("unused")
-    <P extends PtpContainerPayload<P>> EventContainer<P> pollForEvent(P payloadInstance);
+    <P> EventContainer<P> pollForEvent(PayloadDeserializer<P> payloadDeserializer);
 
     /**
      * Sets the default timeout for device operations.

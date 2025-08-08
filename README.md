@@ -32,7 +32,7 @@ public void printPtpDeviceName() {
 
     CommandResult<DeviceInfo> commandResult = ptpDevice.sendCommand(
             CommandContainer.newInstance(OperationCode.GET_DEVICE_INFO, ptpDevice.getSessionId(), ptpDevice.incrementTransactionId()),
-            DeviceInfo.emptyInstance);
+            DeviceInfo.DESERIALIZER);
 
     System.out.println("Found PTP device: " + commandResult.dataContainer().payload().model().value().rawValue());
 

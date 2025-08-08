@@ -1,7 +1,7 @@
 package com.arasse.jptp.main;
 
-import com.arassec.jptp.core.datatype.payload.DataObject;
-import com.arassec.jptp.core.datatype.payload.DeviceInfo;
+import com.arassec.jptp.core.datatype.complex.DataObject;
+import com.arassec.jptp.core.datatype.complex.DeviceInfo;
 
 import java.util.Optional;
 

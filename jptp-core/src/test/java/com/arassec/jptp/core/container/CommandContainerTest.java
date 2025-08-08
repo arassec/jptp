@@ -1,9 +1,9 @@
 package com.arassec.jptp.core.container;
 
 import com.arassec.jptp.core.datatype.UnsignedInt;
-import com.arassec.jptp.core.datatype.valuerange.OperationCode;
-import com.arassec.jptp.core.datatype.simple.SessionId;
-import com.arassec.jptp.core.datatype.simple.TransactionId;
+import com.arassec.jptp.core.datatype.complex.OperationCode;
+import com.arassec.jptp.core.datatype.complex.SessionId;
+import com.arassec.jptp.core.datatype.complex.TransactionId;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

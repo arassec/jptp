@@ -1,18 +1,14 @@
 package com.arassec.jptp.main;
 
 import com.arasse.jptp.main.PtpImageCaptureDevice;
-import com.arassec.jptp.core.PtpContainerPayload;
+import com.arassec.jptp.core.PayloadDeserializer;
 import com.arassec.jptp.core.PtpDevice;
 import com.arassec.jptp.core.PtpDeviceDiscovery;
 import com.arassec.jptp.core.container.CommandContainer;
 import com.arassec.jptp.core.container.DataContainer;
 import com.arassec.jptp.core.container.ResponseContainer;
 import com.arassec.jptp.core.datatype.UnsignedInt;
-import com.arassec.jptp.core.datatype.payload.*;
-import com.arassec.jptp.core.datatype.valuerange.OperationCode;
-import com.arassec.jptp.core.datatype.valuerange.PtpVersion;
-import com.arassec.jptp.core.datatype.valuerange.ResponseCode;
-import com.arassec.jptp.core.datatype.simple.*;
+import com.arassec.jptp.core.datatype.complex.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -90,7 +86,7 @@ class PtpImageCaptureDeviceTest {
         ResponseContainer openSessionResponseContainer = mock(ResponseContainer.class);
         when(openSessionResponseContainer.responseCode()).thenReturn(ResponseCode.SESSION_NOT_OPEN);
 
-        CommandResult<NoData> openSessionCommandResult = new CommandResult<>(null, openSessionResponseContainer);
+        CommandResult<Void> openSessionCommandResult = new CommandResult<>(null, openSessionResponseContainer);
 
         mockCommandHandling(OperationCode.OPEN_SESSION, openSessionCommandResult);
 
@@ -111,11 +107,11 @@ class PtpImageCaptureDeviceTest {
         assertThat(imageCaptureDevice.isInitialized()).isTrue();
 
         // Teardown fails:
-        mockCommandHandling(OperationCode.CLOSE_SESSION, new CommandResult<NoData>(null, new ResponseContainer(null, null, ResponseCode.ACCESS_DENIED, null, null)));
+        mockCommandHandling(OperationCode.CLOSE_SESSION, new CommandResult<Void>(null, new ResponseContainer(null, null, ResponseCode.ACCESS_DENIED, null, null)));
         assertThrows(IllegalStateException.class, imageCaptureDevice::teardown);
 
         // Teardown succeeds:
-        mockCommandHandling(OperationCode.CLOSE_SESSION, new CommandResult<NoData>(null, new ResponseContainer(null, null, ResponseCode.OK, null, null)));
+        mockCommandHandling(OperationCode.CLOSE_SESSION, new CommandResult<Void>(null, new ResponseContainer(null, null, ResponseCode.OK, null, null)));
         assertDoesNotThrow(imageCaptureDevice::teardown);
         assertThat(imageCaptureDevice.isInitialized()).isFalse();
     }
@@ -132,12 +128,12 @@ class PtpImageCaptureDeviceTest {
 
         // Now mock the hole thing...
         CommandContainer expectedCommandContainer = CommandContainer.newInstance(OperationCode.INITIATE_CAPTURE, null, null, UnsignedInt.zeroInstance(), UnsignedInt.zeroInstance());
-        when(ptpDeviceMock.sendCommand(eq(expectedCommandContainer), ArgumentMatchers.<NoData>any()))
+        when(ptpDeviceMock.sendCommand(eq(expectedCommandContainer), ArgumentMatchers.<PayloadDeserializer<Void>>any()))
                 .thenReturn(new CommandResult<>(null,
                         new ResponseContainer(null, null, ResponseCode.OK, null, null)));
 
         AtomicInteger counter = new AtomicInteger(0);
-        when(ptpDeviceMock.sendCommand(eq(CommandContainer.newInstance(OperationCode.GET_OBJECT_HANDLES, null, null, UnsignedInt.maxInstance())), eq(ObjectHandleArray.emptyInstance)))
+        when(ptpDeviceMock.sendCommand(eq(CommandContainer.newInstance(OperationCode.GET_OBJECT_HANDLES, null, null, UnsignedInt.maxInstance())), eq(ObjectHandleArray.DESERIALIZER)))
                 .thenAnswer(invocation -> switch (counter.incrementAndGet()) {
                     case 0, 1 -> new CommandResult<>(
                             new DataContainer<>(null, null, null, null, new ObjectHandleArray(new ArrayList<>(List.of(
@@ -152,14 +148,14 @@ class PtpImageCaptureDeviceTest {
                 });
 
         expectedCommandContainer = CommandContainer.newInstance(OperationCode.GET_OBJECT, null, null, UnsignedInt.valueOf(2));
-        when(ptpDeviceMock.sendCommand(eq(expectedCommandContainer), ArgumentMatchers.<DataObject>any()))
+        when(ptpDeviceMock.sendCommand(eq(expectedCommandContainer), ArgumentMatchers.<PayloadDeserializer<DataObject>>any()))
                 .thenReturn(new CommandResult<>(
                         new DataContainer<>(null, null, null, null, new DataObject(new byte[]{1, 2, 3, 4})),
                         new ResponseContainer(null, null, ResponseCode.OK, null, null)
                 ));
 
         expectedCommandContainer = CommandContainer.newInstance(OperationCode.DELETE_OBJECT, null, null, UnsignedInt.valueOf(2));
-        when(ptpDeviceMock.sendCommand(eq(expectedCommandContainer), ArgumentMatchers.<NoData>any()))
+        when(ptpDeviceMock.sendCommand(eq(expectedCommandContainer), ArgumentMatchers.<PayloadDeserializer<Void>>any()))
                 .thenReturn(new CommandResult<>(
                         null,
                         new ResponseContainer(null, null, ResponseCode.OK, null, null)
@@ -192,7 +188,7 @@ class PtpImageCaptureDeviceTest {
     private void mockPtpDevice(List<OperationCode> operationCodes) {
         DataContainer<DeviceInfo> deviceInfoDataContainer = new DataContainer<>(null, null, null, null,
                 new DeviceInfo(
-                        PtpVersion.V1_0, null, null, null,
+                        Version.V1_0, null, null, null,
                         null, operationCodes, null, null, null,
                         null, null, null, null, null
                 ));
@@ -205,15 +201,15 @@ class PtpImageCaptureDeviceTest {
         ResponseContainer openSessionResponseContainer = mock(ResponseContainer.class);
         when(openSessionResponseContainer.responseCode()).thenReturn(ResponseCode.OK);
 
-        CommandResult<NoData> openSessionCommandResult = new CommandResult<>(null, openSessionResponseContainer);
+        CommandResult<Void> openSessionCommandResult = new CommandResult<>(null, openSessionResponseContainer);
 
         mockCommandHandling(OperationCode.GET_DEVICE_INFO, deviceInfoCommandResult);
         mockCommandHandling(OperationCode.OPEN_SESSION, openSessionCommandResult);
     }
 
-    private <P extends PtpContainerPayload<P>> void mockCommandHandling(OperationCode operationCode, CommandResult<P> commandResult) {
+    private <P> void mockCommandHandling(OperationCode operationCode, CommandResult<P> commandResult) {
         CommandContainer expectedCommandContainer = CommandContainer.newInstance(operationCode, null, null);
-        when(ptpDeviceMock.sendCommand(eq(expectedCommandContainer), ArgumentMatchers.<P>any())).thenReturn(commandResult);
+        when(ptpDeviceMock.sendCommand(eq(expectedCommandContainer), ArgumentMatchers.<PayloadDeserializer<P>>any())).thenReturn(commandResult);
     }
 
 }

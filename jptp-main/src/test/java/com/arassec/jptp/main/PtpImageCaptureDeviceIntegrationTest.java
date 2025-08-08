@@ -2,7 +2,7 @@ package com.arassec.jptp.main;
 
 import com.arasse.jptp.main.ImageCaptureDevice;
 import com.arasse.jptp.main.PtpImageCaptureDevice;
-import com.arassec.jptp.core.datatype.payload.DataObject;
+import com.arassec.jptp.core.datatype.complex.DataObject;
 import com.arassec.jptp.usb.UsbPtpDeviceDiscovery;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

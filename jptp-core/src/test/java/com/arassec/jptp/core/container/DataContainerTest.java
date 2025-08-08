@@ -1,7 +1,7 @@
 package com.arassec.jptp.core.container;
 
-import com.arassec.jptp.core.datatype.valuerange.ContainerType;
-import com.arassec.jptp.core.datatype.valuerange.OperationCode;
+import com.arassec.jptp.core.datatype.ContainerType;
+import com.arassec.jptp.core.datatype.complex.OperationCode;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;

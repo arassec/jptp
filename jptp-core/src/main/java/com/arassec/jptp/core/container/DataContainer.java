@@ -1,11 +1,11 @@
 package com.arassec.jptp.core.container;
 
-import com.arassec.jptp.core.PtpContainerPayload;
+import com.arassec.jptp.core.PayloadDeserializer;
+import com.arassec.jptp.core.datatype.ContainerType;
 import com.arassec.jptp.core.datatype.UnsignedInt;
 import com.arassec.jptp.core.datatype.UnsignedShort;
-import com.arassec.jptp.core.datatype.valuerange.ContainerType;
-import com.arassec.jptp.core.datatype.valuerange.OperationCode;
-import com.arassec.jptp.core.datatype.simple.TransactionId;
+import com.arassec.jptp.core.datatype.complex.OperationCode;
+import com.arassec.jptp.core.datatype.complex.TransactionId;
 
 import java.nio.ByteBuffer;
 
@@ -19,7 +19,7 @@ import java.nio.ByteBuffer;
  * @param payload       The actual payload of the data container.
  * @param <P>           The type of the received payload.
  */
-public record DataContainer<P extends PtpContainerPayload<P>>(
+public record DataContainer<P>(
         UnsignedInt length,
         ContainerType containerType,
         OperationCode operationCode,
@@ -29,18 +29,18 @@ public record DataContainer<P extends PtpContainerPayload<P>>(
     /**
      * Deserializes the supplied byte buffer into a data container instance.
      *
-     * @param buffer          The {@link ByteBuffer} containing the data container.
-     * @param payloadInstance An instance of the expected payload. Used to deserialize it.
-     * @param <P>             The type of the expected payload.
+     * @param buffer              The {@link ByteBuffer} containing the data container.
+     * @param payloadDeserializer A deserializer for the container's payload.
+     * @param <P>                 The type of the expected payload.
      * @return A new {@link DataContainer} instance containing the deserialized data.
      */
-    public static <P extends PtpContainerPayload<P>> DataContainer<P> deserialize(ByteBuffer buffer, P payloadInstance) {
+    public static <P> DataContainer<P> deserialize(ByteBuffer buffer, PayloadDeserializer<P> payloadDeserializer) {
         return new DataContainer<>(
                 UnsignedInt.deserialize(buffer),
                 ContainerType.valueOf(UnsignedShort.deserialize(buffer)),
                 OperationCode.valueOf(UnsignedShort.deserialize(buffer)),
                 new TransactionId(UnsignedInt.deserialize(buffer)),
-                payloadInstance.deserialize(buffer)
+                payloadDeserializer.deserialize(buffer)
         );
     }
 
