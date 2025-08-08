@@ -47,6 +47,8 @@ class UsbPtpIntegrationTest {
                     CommandContainer.newInstance(OperationCode.GET_DEVICE_INFO, ptpDevice.getSessionId(), ptpDevice.incrementTransactionId()),
                     DeviceInfo.DESERIALIZER);
 
+            assertThat(commandResult).isNotNull();
+
             log.info("Data from PTP device: {}", commandResult.dataContainer());
             log.info("Response from PTP device: {}", commandResult.responseContainer());
 

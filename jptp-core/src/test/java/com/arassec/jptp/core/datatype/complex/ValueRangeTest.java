@@ -24,9 +24,14 @@ abstract class ValueRangeTest {
             if (Modifier.isPublic(field.getModifiers())
                     && Modifier.isStatic(field.getModifiers())) {
                 try {
+                    // Test regular code handling:
                     Object constantValue = field.get(null);
                     Object result = method.invoke(null, valueExtractor.getCode(constantValue));
                     assertThat(result).isEqualTo(constantValue);
+
+                    // Test unknown code handling:
+                    Object fallback = method.invoke(null, UnsignedShort.valueOf((short) 999999));
+                    assertThat(fallback).isNotNull();
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     throw new IllegalStateException(e);
                 }

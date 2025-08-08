@@ -14,8 +14,8 @@ class ResponseCodeTest extends ValueRangeTest {
      */
     @Test
     void testToString() {
-        assertThat(ResponseCode.INVALID_CODE_FORMAT.toString())
-                .isEqualTo("ResponseCode[code='0x2016', description='Invalid Code Format']");
+        assertThat(ResponseCode.INVALID_CODE_FORMAT)
+                .hasToString("ResponseCode[code='0x2016', description='Invalid Code Format']");
     }
 
     /**

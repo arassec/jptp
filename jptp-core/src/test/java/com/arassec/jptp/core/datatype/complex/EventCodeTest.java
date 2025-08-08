@@ -18,8 +18,8 @@ class EventCodeTest extends ValueRangeTest {
      */
     @Test
     void testToString() {
-        assertThat(EventCode.DEVICE_RESET.toString())
-                .isEqualTo("EventCode[code='0x400B', name='DeviceReset']");
+        assertThat(EventCode.DEVICE_RESET)
+                .hasToString("EventCode[code='0x400B', name='DeviceReset']");
     }
 
     /**
@@ -34,7 +34,7 @@ class EventCodeTest extends ValueRangeTest {
         buffer.rewind();
 
         List<EventCode> devicePropCodes = EventCode.deserializeArray(buffer);
-        assertThat(devicePropCodes.size()).isEqualTo(2);
+        assertThat(devicePropCodes).hasSize(2);
         assertThat(devicePropCodes.get(0)).isEqualTo(EventCode.DEVICE_PROP_CHANGED);
         assertThat(devicePropCodes.get(1)).isEqualTo(EventCode.CAPTURE_COMPLETE);
     }

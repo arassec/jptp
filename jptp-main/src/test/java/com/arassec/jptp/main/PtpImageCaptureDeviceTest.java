@@ -133,7 +133,7 @@ class PtpImageCaptureDeviceTest {
                         new ResponseContainer(null, null, ResponseCode.OK, null, null)));
 
         AtomicInteger counter = new AtomicInteger(0);
-        when(ptpDeviceMock.sendCommand(eq(CommandContainer.newInstance(OperationCode.GET_OBJECT_HANDLES, null, null, UnsignedInt.maxInstance())), eq(ObjectHandleArray.DESERIALIZER)))
+        when(ptpDeviceMock.sendCommand(CommandContainer.newInstance(OperationCode.GET_OBJECT_HANDLES, null, null, UnsignedInt.maxInstance()), ObjectHandleArray.DESERIALIZER))
                 .thenAnswer(invocation -> switch (counter.incrementAndGet()) {
                     case 0, 1 -> new CommandResult<>(
                             new DataContainer<>(null, null, null, null, new ObjectHandleArray(new ArrayList<>(List.of(

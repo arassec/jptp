@@ -18,8 +18,8 @@ class DevicePropCodeTest extends ValueRangeTest {
      */
     @Test
     void testToString() {
-        assertThat(DevicePropCode.AUDIO_BITRATE.toString())
-                .isEqualTo("DevicePropCode[code='0x5029', name='AudioBitrate']");
+        assertThat(DevicePropCode.AUDIO_BITRATE)
+                .hasToString("DevicePropCode[code='0x5029', name='AudioBitrate']");
     }
 
     /**
@@ -34,7 +34,7 @@ class DevicePropCodeTest extends ValueRangeTest {
         buffer.rewind();
 
         List<DevicePropCode> devicePropCodes = DevicePropCode.deserializeArray(buffer);
-        assertThat(devicePropCodes.size()).isEqualTo(2);
+        assertThat(devicePropCodes).hasSize(2);
         assertThat(devicePropCodes.get(0)).isEqualTo(DevicePropCode.BATTERY_LEVEL);
         assertThat(devicePropCodes.get(1)).isEqualTo(DevicePropCode.FLASH_MODE);
     }

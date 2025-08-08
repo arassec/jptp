@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the {@link ResponseContainer}.
  */
-public class ResponseContainerTest extends BaseContainerTest {
+class ResponseContainerTest extends BaseContainerTest {
 
     /**
      * Tests deserializing a response container.

@@ -18,8 +18,8 @@ class OperationCodeTest extends ValueRangeTest {
      */
     @Test
     void testToString() {
-        assertThat(OperationCode.GET_DEVICE_INFO.toString())
-                .isEqualTo("OperationCode[code='0x1001', name='GetDeviceInfo']");
+        assertThat(OperationCode.GET_DEVICE_INFO)
+                .hasToString("OperationCode[code='0x1001', name='GetDeviceInfo']");
     }
 
     /**
@@ -34,7 +34,7 @@ class OperationCodeTest extends ValueRangeTest {
         buffer.rewind();
 
         List<OperationCode> devicePropCodes = OperationCode.deserializeArray(buffer);
-        assertThat(devicePropCodes.size()).isEqualTo(2);
+        assertThat(devicePropCodes).hasSize(2);
         assertThat(devicePropCodes.get(0)).isEqualTo(OperationCode.INITIATE_CAPTURE);
         assertThat(devicePropCodes.get(1)).isEqualTo(OperationCode.GET_RESIZED_IMAGE_OBJECT);
     }

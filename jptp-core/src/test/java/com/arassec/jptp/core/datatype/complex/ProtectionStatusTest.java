@@ -14,8 +14,8 @@ class ProtectionStatusTest extends ValueRangeTest {
      */
     @Test
     void testToString() {
-        assertThat(ProtectionStatus.READ_ONLY.toString())
-                .isEqualTo("ProtectionStatus[code='0x0001', description='Read only']");
+        assertThat(ProtectionStatus.READ_ONLY)
+                .hasToString("ProtectionStatus[code='0x0001', description='Read only']");
     }
 
     /**

@@ -14,8 +14,8 @@ class AssociationCodeTest extends ValueRangeTest {
      */
     @Test
     void testToString() {
-        assertThat(AssociationCode.ALBUM.toString())
-                .isEqualTo("AssociationCode[code='0x0002', type='Album']");
+        assertThat(AssociationCode.ALBUM)
+                .hasToString("AssociationCode[code='0x0002', type='Album']");
     }
 
     /**

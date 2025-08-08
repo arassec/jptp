@@ -14,8 +14,8 @@ class FunctionalModeTest extends ValueRangeTest {
      */
     @Test
     void testToString() {
-        assertThat(FunctionalMode.STANDARD.toString())
-                .isEqualTo("FunctionalMode[mode='0x0000', description='Standard mode']");
+        assertThat(FunctionalMode.STANDARD)
+                .hasToString("FunctionalMode[mode='0x0000', description='Standard mode']");
     }
 
     /**

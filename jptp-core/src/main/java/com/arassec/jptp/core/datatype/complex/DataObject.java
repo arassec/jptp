@@ -11,6 +11,7 @@ import java.util.Objects;
  *
  * @param data The data as byte array.
  */
+@SuppressWarnings("java:S6218") // toString() method doesn't make sense.
 public record DataObject(byte[] data) {
 
     /**
@@ -40,4 +41,5 @@ public record DataObject(byte[] data) {
     public int hashCode() {
         return Arrays.hashCode(data);
     }
+
 }

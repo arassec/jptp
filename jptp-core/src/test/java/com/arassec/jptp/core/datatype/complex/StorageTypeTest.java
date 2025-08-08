@@ -14,8 +14,8 @@ class StorageTypeTest extends ValueRangeTest {
      */
     @Test
     void testToString() {
-        assertThat(StorageType.REMOVABLE_RAM.toString())
-                .isEqualTo("StorageType[code='0x0004', type='Removable RAM']");
+        assertThat(StorageType.REMOVABLE_RAM)
+                .hasToString("StorageType[code='0x0004', type='Removable RAM']");
     }
 
     /**

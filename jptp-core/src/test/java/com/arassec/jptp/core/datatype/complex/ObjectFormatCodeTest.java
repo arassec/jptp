@@ -18,8 +18,8 @@ class ObjectFormatCodeTest extends ValueRangeTest {
      */
     @Test
     void testToString() {
-        assertThat(ObjectFormatCode.EXIF_JPEG.toString())
-                .isEqualTo("ObjectFormatCode[code='0x3801', format='Exif/JPEG']");
+        assertThat(ObjectFormatCode.EXIF_JPEG)
+                .hasToString("ObjectFormatCode[code='0x3801', format='Exif/JPEG']");
     }
 
     /**
@@ -34,7 +34,7 @@ class ObjectFormatCodeTest extends ValueRangeTest {
         buffer.rewind();
 
         List<ObjectFormatCode> devicePropCodes = ObjectFormatCode.deserializeArray(buffer);
-        assertThat(devicePropCodes.size()).isEqualTo(2);
+        assertThat(devicePropCodes).hasSize(2);
         assertThat(devicePropCodes.get(0)).isEqualTo(ObjectFormatCode.EXIF_JPEG);
         assertThat(devicePropCodes.get(1)).isEqualTo(ObjectFormatCode.MP3);
     }

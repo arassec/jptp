@@ -17,10 +17,10 @@ class UnsignedIntTest {
      */
     @Test
     void testInstanceCreationAndConversion() {
-        assertThat(UnsignedInt.valueOf(0).value()).isEqualTo(UnsignedInt.zero());
-        assertThat(UnsignedInt.zeroInstance().value()).isEqualTo(UnsignedInt.zero());
+        assertThat(UnsignedInt.valueOf(0).value()).isEqualTo(UnsignedInt.ZERO);
+        assertThat(UnsignedInt.zeroInstance().value()).isEqualTo(UnsignedInt.ZERO);
 
-        assertThat(UnsignedInt.max()).isEqualTo(-1);
+        assertThat(-1).isEqualTo(UnsignedInt.MAX);
         assertThat(UnsignedInt.maxInstance().value()).isEqualTo(-1);
     }
 

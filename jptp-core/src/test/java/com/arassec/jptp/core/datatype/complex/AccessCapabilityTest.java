@@ -14,8 +14,8 @@ class AccessCapabilityTest extends ValueRangeTest {
      */
     @Test
     void testToString() {
-        assertThat(AccessCapability.READ_ONLY_WITHOUT_OBJECT_DELETION.toString())
-                .isEqualTo("AccessCapability[code='0x0001', description='Read-only without object deletion']");
+        assertThat(AccessCapability.READ_ONLY_WITHOUT_OBJECT_DELETION)
+                .hasToString("AccessCapability[code='0x0001', description='Read-only without object deletion']");
     }
 
     /**

@@ -16,34 +16,37 @@ import java.util.List;
  */
 public record ObjectFormatCode(UnsignedShort code, char type, String format, String description) {
 
-    public static ObjectFormatCode UNDEFINED = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3000), 'A', "Undefined", "Undefined non-image object");
+    private static final String UNDEFINED_FORMAT = "Undefined";
+    private static final String AUDIO_CLIP_FORMAT = "Audio clip";
+
+    public static ObjectFormatCode UNDEFINED = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3000), 'A', UNDEFINED_FORMAT, "Undefined non-image object");
     public static ObjectFormatCode ASSOCIATION = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3001), 'A', "Association", "Association (e.g. folder)");
     public static ObjectFormatCode SCRIPT = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3002), 'A', "Script", "Device-model-specific script");
     public static ObjectFormatCode EXECUTABLE = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3003), 'A', "Executable", "Device-model-specific binary executable");
     public static ObjectFormatCode TEXT = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3004), 'A', "Text", "Text file");
     public static ObjectFormatCode HTML = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3005), 'A', "HTML", "HyperText Markup Language file (text)");
     public static ObjectFormatCode DPOF = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3006), 'A', "DPOF", "Digital Print Order Format file (text)");
-    public static ObjectFormatCode AIFF = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3007), 'A', "AIFF", "Audio clip");
-    public static ObjectFormatCode WAV = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3008), 'A', "WAV", "Audio clip");
-    public static ObjectFormatCode MP3 = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3009), 'A', "MP3", "Audio clip");
+    public static ObjectFormatCode AIFF = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3007), 'A', "AIFF", AUDIO_CLIP_FORMAT);
+    public static ObjectFormatCode WAV = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3008), 'A', "WAV", AUDIO_CLIP_FORMAT);
+    public static ObjectFormatCode MP3 = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3009), 'A', "MP3", AUDIO_CLIP_FORMAT);
     public static ObjectFormatCode AVI = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x300A), 'A', "AVI", "Video clip");
     public static ObjectFormatCode MPEG = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x300B), 'A', "MPEG", "Video clip");
     public static ObjectFormatCode ASF = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x300C), 'A', "ASF", "Microsoft Advanced Streaming Format (video)");
     public static ObjectFormatCode QUICKTIME = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x300D), 'A', "QuickTime", "Apple QuickTime video format");
     public static ObjectFormatCode XML = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x300E), 'A', "XML", "eXtensible Markup Language file");
-    public static ObjectFormatCode UNKNOWN = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3800), 'I', "Undefined", "Unknown image object");
+    public static ObjectFormatCode UNKNOWN = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3800), 'I', UNDEFINED_FORMAT, "Unknown image object");
     public static ObjectFormatCode EXIF_JPEG = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3801), 'I', "Exif/JPEG", "Exchangeable File Format. JEITA standard");
     public static ObjectFormatCode TIFF_EP = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3802), 'I', "TIFF/EP", "Tag Image File Format for Electronic Photography");
     public static ObjectFormatCode FLASHPIX = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3803), 'I', "FlashPix", "Structured Storage Image Format");
     public static ObjectFormatCode BMP = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3804), 'I', "BMP", "Microsoft Windows Bitmap file");
     public static ObjectFormatCode CIFF = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3805), 'I', "CIFF", "Canon Camera Image File Format");
-    public static ObjectFormatCode RESERVED = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3806), 'I', "Undefined", "Reserved");
+    public static ObjectFormatCode RESERVED = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3806), 'I', UNDEFINED_FORMAT, "Reserved");
     public static ObjectFormatCode GIF = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3807), 'I', "GIF", "Graphics Interchange Format");
     public static ObjectFormatCode JFIF = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3808), 'I', "JFIF", "JPEG File Interchange Format");
     public static ObjectFormatCode PCD = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x3809), 'I', "PCD", "PhotoCD Image Pac");
     public static ObjectFormatCode PICT = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x380A), 'I', "PICT", "Quickdraw Image Format");
     public static ObjectFormatCode PNG = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x380B), 'I', "PNG", "Portable Network Graphics");
-    public static ObjectFormatCode RESERVED_TWO = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x380C), 'I', "Undefined", "Reserved");
+    public static ObjectFormatCode RESERVED_TWO = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x380C), 'I', UNDEFINED_FORMAT, "Reserved");
     public static ObjectFormatCode TIFF = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x380D), 'I', "TIFF", "Tag Image File Format");
     public static ObjectFormatCode TIFF_IT = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x380E), 'I', "TIFF/IT", "Tag Image File Format for Image Technology");
     public static ObjectFormatCode JP2 = new ObjectFormatCode(UnsignedShort.valueOf((short) 0x380F), 'I', "JP2", "JPEG2000 Baseline File Format");
@@ -56,6 +59,7 @@ public record ObjectFormatCode(UnsignedShort code, char type, String format, Str
      * @param code The code to use.
      * @return An {@link ObjectFormatCode} for the given code.
      */
+    @SuppressWarnings("java:S1479") // The number of switch cases will be reduced.
     public static ObjectFormatCode valueOf(UnsignedShort code) {
         return switch (code.value()) {
             case 0x3000 -> UNDEFINED;
@@ -91,7 +95,8 @@ public record ObjectFormatCode(UnsignedShort code, char type, String format, Str
             case 0x380F -> JP2;
             case 0x3810 -> JPX;
             case 0x3811 -> DNG;
-            default -> new ObjectFormatCode(code, 'X', "Undefined / Vendor-defined", "Reserved for future use / Vendor-defined");
+            default ->
+                    new ObjectFormatCode(code, 'X', "Undefined / Vendor-defined", "Reserved for future use / Vendor-defined");
         };
     }
 

@@ -14,8 +14,8 @@ class FilesystemTypeTest extends ValueRangeTest {
      */
     @Test
     void testToString() {
-        assertThat(FilesystemType.GENERIC_FLAT.toString())
-                .isEqualTo("FilesystemType[code='0x0001', description='Generic flat']");
+        assertThat(FilesystemType.GENERIC_FLAT)
+                .hasToString("FilesystemType[code='0x0001', description='Generic flat']");
     }
 
     /**
