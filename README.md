@@ -13,10 +13,8 @@ So far, the implementation has been tested with the following cameras:
 
 ## Releases
 
-[![Code Coverage](https://img.shields.io/sonar/coverage/arassec_jptp?server=http%3A%2F%2Fsonarcloud.io)](https://sonarcloud.io/component_measures?id=arassec_jptp&metric=coverage&view=treemap)
-
 The released versions are available
-at: [![Maven Central](https://img.shields.io/maven-central/v/com.arassec.jptp/jptp)](https://central.sonatype.com/search?q=jptp)
+at: [![Maven Central](https://img.shields.io/maven-central/v/com.arassec.jptp/jptp?color=green)](https://central.sonatype.com/search?q=jptp)
 
 ## Modules
 
