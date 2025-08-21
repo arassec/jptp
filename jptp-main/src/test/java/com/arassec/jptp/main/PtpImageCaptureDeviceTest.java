@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -70,12 +71,23 @@ class PtpImageCaptureDeviceTest {
     }
 
     /**
-     * Tests initialization with a PTP valid device.
+     * Tests initialization with a valid PTP device.
      */
     @Test
     void testInitializeWithPtpDevice() {
         assertThat(imageCaptureDevice.initialize()).isTrue();
         assertThat(imageCaptureDevice.isInitialized()).isTrue();
+    }
+
+    /**
+     * Tests initialization with a valid PTP device and timeout configuration.
+     */
+    @Test
+    void testInitializeWithTimeouts() {
+        assertThat(imageCaptureDevice.initialize(Duration.ofSeconds(15), Duration.ofMinutes(1))).isTrue();
+        assertThat(imageCaptureDevice.isInitialized()).isTrue();
+        verify(ptpDeviceMock).setDefaultTimeoutInMillis(15000);
+        verify(ptpDeviceMock).setEventTimeoutInMillis(60000);
     }
 
     /**

@@ -79,7 +79,7 @@ public class UsbPtpDevice implements PtpDevice {
     /**
      * Default timeout for USB device communication.
      */
-    private long defaultTimeoutInMillis = 1000;
+    private long defaultTimeoutInMillis = 5000;
 
     /**
      * Timeout for waiting for USB device events.

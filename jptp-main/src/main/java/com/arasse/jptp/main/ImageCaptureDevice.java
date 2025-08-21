@@ -3,6 +3,7 @@ package com.arasse.jptp.main;
 import com.arassec.jptp.core.datatype.complex.DataObject;
 import com.arassec.jptp.core.datatype.complex.DeviceInfo;
 
+import java.time.Duration;
 import java.util.Optional;
 
 /**
@@ -14,12 +15,22 @@ import java.util.Optional;
 public interface ImageCaptureDevice {
 
     /**
-     * Initializes the device manager. The first available {@link com.arassec.jptp.core.PtpDevice} found is used, if
+     * Initializes the device. The first available {@link com.arassec.jptp.core.PtpDevice} found is used, if
      * it supports all required operations.
      *
      * @return {@code true}, if the device has been initialized successfully, {@code false} otherwise.
      */
     boolean initialize();
+
+    /**
+     * Initializes the device. The first available {@link com.arassec.jptp.core.PtpDevice} found is used, if
+     * it supports all required operations.
+     *
+     * @param defaultTimeout Timeout for PTP operations.
+     * @param eventTimeout   Timeout for PTP events.
+     * @return {@code true}, if the device has been initialized successfully, {@code false} otherwise.
+     */
+    boolean initialize(Duration defaultTimeout, Duration eventTimeout);
 
     /**
      * Returns whether the device has been initialized or not.

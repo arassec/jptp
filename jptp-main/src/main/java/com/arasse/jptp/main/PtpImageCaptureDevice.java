@@ -9,6 +9,7 @@ import com.arassec.jptp.core.datatype.complex.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -82,6 +83,19 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean initialize(Duration defaultTimeout, Duration eventTimeout) {
+        boolean initSuccess = initialize();
+        if (initSuccess) {
+            ptpDevice.setDefaultTimeoutInMillis(defaultTimeout.toMillis());
+            ptpDevice.setEventTimeoutInMillis(eventTimeout.toMillis());
+        }
+        return initSuccess;
     }
 
     /**
