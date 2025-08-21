@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,7 +34,7 @@ class PtpImageCaptureDeviceIntegrationTest {
      * @throws IOException In case of errors.
      */
     @Test
-    void testCaptureImage() throws IOException {
+    void testCaptureImage() throws IOException, InterruptedException {
         Path testImage = Path.of("target/test.jpg");
 
         Files.deleteIfExists(testImage);
@@ -41,8 +42,11 @@ class PtpImageCaptureDeviceIntegrationTest {
         ImageCaptureDevice imageCaptureDevice = new PtpImageCaptureDevice(new UsbPtpDeviceDiscovery());
 
         // Execute two times to test LibUsb context renewal.
-        captureImage(imageCaptureDevice);
-        captureImage(imageCaptureDevice);
+        for (int i = 0; i < 36; i++) {
+            captureImage(imageCaptureDevice);
+            Thread.sleep(250);
+            log.info("Captured image {}", i + 1);
+        }
 
         assertThat(Files.exists(testImage)).isTrue();
     }
@@ -54,7 +58,7 @@ class PtpImageCaptureDeviceIntegrationTest {
      * @throws IOException In case of errors.
      */
     private void captureImage(ImageCaptureDevice imageCaptureDevice) throws IOException {
-        if (imageCaptureDevice.initialize()) {
+        if (imageCaptureDevice.initialize(Duration.ofSeconds(5), Duration.ofSeconds(5))) {
             Optional<DataObject> optionalDataObject = imageCaptureDevice.captureImage();
             if (optionalDataObject.isPresent()) {
                 Files.write(Path.of("target/test.jpg"), optionalDataObject.get().data());
