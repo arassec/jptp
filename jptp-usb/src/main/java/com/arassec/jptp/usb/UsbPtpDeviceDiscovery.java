@@ -57,10 +57,9 @@ public class UsbPtpDeviceDiscovery implements PtpDeviceDiscovery {
      */
     @Override
     public void initialize() {
-        if (!initialized) {
-            executeAndVerify(() -> LibUsb.init(null), "Unable to initialize LibUsb");
-            initialized = true;
-        }
+        teardown();
+        executeAndVerify(() -> LibUsb.init(null), "Unable to initialize LibUsb");
+        initialized = true;
     }
 
     /**

@@ -65,20 +65,18 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
      */
     @Override
     public boolean initialize() {
+        teardown();
+        ptpDeviceDiscovery.initialize();
 
-        if (!initialized) {
-            ptpDeviceDiscovery.initialize();
-
-            for (PtpDevice device : ptpDeviceDiscovery.discoverPtpDevices()) {
-                Optional<DeviceInfo> optionalDeviceInfo = initializeDevice(device);
-                if (optionalDeviceInfo.isPresent()) {
-                    selectedDeviceInfo = optionalDeviceInfo.get();
-                    ptpDevice = device;
-                    initialized = true;
-                    log.info("PTP device found and initialized: {} - {}",
-                            selectedDeviceInfo.manufacturer(), selectedDeviceInfo.model());
-                    return true;
-                }
+        for (PtpDevice device : ptpDeviceDiscovery.discoverPtpDevices()) {
+            Optional<DeviceInfo> optionalDeviceInfo = initializeDevice(device);
+            if (optionalDeviceInfo.isPresent()) {
+                selectedDeviceInfo = optionalDeviceInfo.get();
+                ptpDevice = device;
+                initialized = true;
+                log.info("PTP device found and initialized: {} - {}",
+                        selectedDeviceInfo.manufacturer(), selectedDeviceInfo.model());
+                return true;
             }
         }
 
@@ -112,7 +110,6 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
     @Override
     public void teardown() {
         if (initialized) {
-
             ResponseContainer responseContainer = ptpDevice
                     .sendCommand(CommandContainer.newInstance(OperationCode.CLOSE_SESSION, null, ptpDevice.incrementTransactionId()), null)
                     .responseContainer();
