@@ -56,7 +56,7 @@
         <sonar.coverage.exclusions>jptp-usb/**</sonar.coverage.exclusions>
 
         <!-- Versions -->
-        <mockito.version>5.20.0</mockito.version>
+        <mockito.version>5.21.0</mockito.version>
     </properties>
 
     <modules>
