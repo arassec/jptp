@@ -5,6 +5,7 @@ import com.arassec.jptp.core.datatype.UnsignedShort;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Value object modeling a PTP operation code.
@@ -118,6 +119,23 @@ public record OperationCode(UnsignedShort code, String name, Version ptpVersion)
             operationCodes.add(OperationCode.valueOf(UnsignedShort.deserialize(buffer)));
         }
         return operationCodes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof OperationCode that)) return false;
+        return Objects.equals(code, that.code);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(code);
     }
 
     /**

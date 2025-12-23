@@ -6,8 +6,10 @@ This is a rudimentary Java implementation of the "Picture Transfer Protocol" (PT
 The main goal is to provide an easy-to-use Java interface to USB connected cameras for image capturing.
 
 Not everything specified in ISO-15740 might be supported e.g., the network transport layer has not been implemented.
+Main focus so far has been capturing images and downloading them.
 
 So far, the implementation has been tested with the following cameras:
+* Canon EOS 500D
 * Nikon D3200
 * Nikon Z30
 

@@ -14,8 +14,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 /**
  * Integration test of the {@link ImageCaptureDevice} for manual use.
@@ -34,7 +36,7 @@ class PtpImageCaptureDeviceIntegrationTest {
      * @throws IOException In case of errors.
      */
     @Test
-    void testCaptureImage() throws IOException, InterruptedException {
+    void testCaptureImage() throws IOException {
         Path testImage = Path.of("target/test.jpg");
 
         Files.deleteIfExists(testImage);
@@ -44,7 +46,7 @@ class PtpImageCaptureDeviceIntegrationTest {
         // Execute two times to test LibUsb context renewal.
         for (int i = 0; i < 36; i++) {
             captureImage(imageCaptureDevice);
-            Thread.sleep(250);
+            await().atMost(500, TimeUnit.MILLISECONDS).until(() -> Files.exists(testImage));
             log.info("Captured image {}", i + 1);
         }
 
@@ -58,7 +60,7 @@ class PtpImageCaptureDeviceIntegrationTest {
      * @throws IOException In case of errors.
      */
     private void captureImage(ImageCaptureDevice imageCaptureDevice) throws IOException {
-        if (imageCaptureDevice.initialize(Duration.ofSeconds(5), Duration.ofSeconds(5))) {
+        if (imageCaptureDevice.initialize(Duration.ofSeconds(15), Duration.ofSeconds(15))) {
             Optional<DataObject> optionalDataObject = imageCaptureDevice.captureImage();
             if (optionalDataObject.isPresent()) {
                 Files.write(Path.of("target/test.jpg"), optionalDataObject.get().data());

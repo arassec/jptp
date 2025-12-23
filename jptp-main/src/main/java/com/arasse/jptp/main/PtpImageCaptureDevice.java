@@ -1,5 +1,8 @@
 package com.arasse.jptp.main;
 
+import com.arasse.jptp.main.adapter.VendorAdapter;
+import com.arasse.jptp.main.adapter.vendor.CanonVendorAdapter;
+import com.arasse.jptp.main.adapter.vendor.DefaultVendorAdapter;
 import com.arassec.jptp.core.PtpDevice;
 import com.arassec.jptp.core.PtpDeviceDiscovery;
 import com.arassec.jptp.core.container.CommandContainer;
@@ -31,6 +34,14 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
     private final PtpDeviceDiscovery ptpDeviceDiscovery;
 
     /**
+     * List of all available vendor adapters.
+     */
+    private final List<VendorAdapter> vendorAdapters = List.of(
+            new DefaultVendorAdapter(),
+            new CanonVendorAdapter()
+    );
+
+    /**
      * Stores whether the class has been initialized or not.
      */
     private boolean initialized = false;
@@ -50,6 +61,11 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
      * not responded with the events specified in the standard.
      */
     private List<ObjectHandle> existingObjects;
+
+    /**
+     * The selected vendor adapter.
+     */
+    private VendorAdapter selectedVendorAdapter;
 
     /**
      * Creates a new instance.
@@ -150,10 +166,8 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
 
         existingObjects = getObjectHandles().handles();
 
-        ResponseContainer responseContainer = ptpDevice.sendCommand(CommandContainer.newInstance(OperationCode.INITIATE_CAPTURE,
-                        null, ptpDevice.incrementTransactionId(), UnsignedInt.zeroInstance(), UnsignedInt.zeroInstance()), null)
-                .responseContainer();
-        if (!ResponseCode.OK.equals(responseContainer.responseCode())) {
+        ResponseCode responseCode = selectedVendorAdapter.sendCaptureCommands(ptpDevice);
+        if (!ResponseCode.OK.equals(responseCode)) {
             throw new IllegalStateException("Could not initiate capture mode!");
         }
 
@@ -183,11 +197,16 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
         } else {
             DeviceInfo deviceInfo = deviceInfoCommandResult.dataContainer().payload();
 
-            if (deviceDoesNotSupport(deviceInfo, OperationCode.INITIATE_CAPTURE)
-                    || deviceDoesNotSupport(deviceInfo, OperationCode.GET_OBJECT_HANDLES)
-                    || deviceDoesNotSupport(deviceInfo, OperationCode.GET_OBJECT)) {
+            Optional<VendorAdapter> optionalVendorAdapter = vendorAdapters.stream()
+                    .filter(adapter -> adapter.supports(deviceInfo))
+                    .findFirst();
+
+            if (optionalVendorAdapter.isEmpty()) {
                 log.debug("PTP device does not support required operations!");
                 return Optional.empty();
+            } else {
+                selectedVendorAdapter = optionalVendorAdapter.get();
+                log.debug("Selected vendor adapter: {}", selectedVendorAdapter.getClass().getSimpleName());
             }
 
             ResponseContainer responseContainer = ptpDevice
@@ -277,18 +296,6 @@ public class PtpImageCaptureDevice implements ImageCaptureDevice {
             throw new IllegalStateException("Could not load object handles!");
         }
         return result.dataContainer().payload();
-    }
-
-    /**
-     * Checks whether the supplied device supports the required operation.
-     *
-     * @param deviceInfo    The device's {@link DeviceInfo}.
-     * @param operationCode The required {@link OperationCode}.
-     * @return {@code true}, if the device supports the operation, {@code false} otherwise.
-     */
-    private boolean deviceDoesNotSupport(DeviceInfo deviceInfo, OperationCode operationCode) {
-        return deviceInfo.operationsSupported().stream()
-                .noneMatch(operationCode::equals);
     }
 
 }
